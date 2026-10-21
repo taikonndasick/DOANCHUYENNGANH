@@ -1,0 +1,92 @@
+﻿@model QuanLyKTX.Models.Service
+
+@{
+    ViewData["Title"] = "Xác nhận xóa dịch vụ";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            @* Khối cảnh báo chính *@
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-body p-5 text-center">
+                    <div class="mb-4">
+                        <i class="bi bi-exclamation-octagon text-danger display-1"></i>
+                    </div>
+                    <h3 class="fw-bold text-dark">Gỡ bỏ dịch vụ?</h3>
+                    <p class="text-muted">Hành động này không thể hoàn tác. Mọi dữ liệu cấu hình của dịch vụ này sẽ bị loại bỏ khỏi hệ thống quản lý.</p>
+
+                    @* Tóm tắt thông tin dịch vụ sắp xóa *@
+                    <div class="p-4 bg-light rounded-4 my-4 text-start border border-danger-subtle">
+                        <div class="mb-2">
+                            <span class="text-muted small fw-bold text-uppercase">Tên dịch vụ:</span>
+                            <div class="fw-bold text-dark fs-5">@Model.Name</div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="text-muted small fw-bold text-uppercase">Đơn giá:</span>
+                                <div class="text-danger fw-bold">@Model.Price.ToString("N0") đ</div>
+                            </div>
+                            <div class="text-end">
+                                <span class="text-muted small fw-bold text-uppercase">Loại:</span>
+                                <div><span class="badge bg-secondary-subtle text-secondary border">@Model.Type</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @* Form xác nhận *@
+                    <form asp-action="Delete">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="d-grid gap-3">
+                            <button type="submit" class="btn btn-danger btn-lg rounded-pill fw-bold py-3 shadow-sm">
+                                <i class="bi bi-trash3-fill me-2"></i>XÁC NHẬN XÓA VĨNH VIỄN
+                            </button>
+                            <a asp-action="Index" class="btn btn-link text-secondary text-decoration-none fw-bold">
+                                Không, quay lại danh sách
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            @* Widget cảnh báo hệ lụy *@
+            <div class="alert alert-warning border-0 rounded-4 shadow-sm p-4 mt-4">
+                <div class="d-flex">
+                    <i class="bi bi-shield-exclamation fs-3 me-3"></i>
+                    <div>
+                        <h6 class="fw-bold mb-1">Lưu ý hệ thống</h6>
+                        <small class="d-block">Nếu dịch vụ này đang có cư dân đăng ký sử dụng, việc xóa có thể gây lỗi dữ liệu hóa đơn. Hãy đảm bảo đã hủy hết các liên kết trước khi thực hiện.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Hiệu ứng rung nhẹ khi load trang để gây chú ý */
+    .display-1 {
+        animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        transform: translate3d(0, 0, 0);
+    }
+
+    @@keyframes shake {
+        10%, 90% {
+            transform: translate3d(-1px, 0, 0);
+        }
+
+        20%, 80% {
+            transform: translate3d(2px, 0, 0);
+        }
+
+        30%, 50%, 70% {
+            transform: translate3d(-4px, 0, 0);
+        }
+
+        40%, 60% {
+            transform: translate3d(4px, 0, 0);
+        }
+    }
+</style>

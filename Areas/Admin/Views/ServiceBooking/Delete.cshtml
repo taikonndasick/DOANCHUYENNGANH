@@ -1,0 +1,123 @@
+﻿@model QuanLyKTX.Models.ServiceBooking
+
+@{
+    ViewData["Title"] = "Xác nhận xóa booking";
+}
+
+<div class="container py-4">
+    <div class="row">
+        @* Tiêu đề trang với sắc đỏ cảnh báo *@
+        <div class="col-12 mb-4">
+            <h3 class="fw-bold text-danger">
+                <i class="bi bi-exclamation-octagon-fill me-2"></i>Xác nhận xóa bản ghi
+            </h3>
+            <p class="text-muted">Bạn đang thực hiện thao tác xóa vĩnh viễn dữ liệu booking này khỏi hệ thống.</p>
+        </div>
+    </div>
+
+    <form asp-action="Delete" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
+
+        <div class="row">
+            @* PHẦN CHÍNH (8 cột): Hiển thị thông tin bản ghi sẽ bị xóa *@
+            <div class="col-lg-8 mb-4">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-header bg-white border-0 pt-4 ps-4">
+                        <h5 class="fw-bold mb-0">Nội dung Booking</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        @* Cảnh báo quan trọng *@
+                        <div class="alert alert-danger-subtle border-0 rounded-4 p-3 mb-4 d-flex align-items-center">
+                            <i class="bi bi-shield-exclamation fs-3 me-3 text-danger"></i>
+                            <div>
+                                <div class="fw-bold text-danger">Cảnh báo nguy hiểm!</div>
+                                <div class="small">Hành động này không thể hoàn tác. Mọi dữ liệu liên quan đến lịch đặt này sẽ bị mất.</div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted small fw-bold text-uppercase d-block mb-1">Cư dân</label>
+                                <div class="fw-bold fs-5">@Model.ResidentProfile?.FullName</div>
+                                <div class="text-muted small">ID: #@Model.ResidentProfileId</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted small fw-bold text-uppercase d-block mb-1">Dịch vụ</label>
+                                <div class="fw-bold fs-5">@Model.Service?.Name</div>
+                                <div class="text-muted small">Phân loại dịch vụ</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-0">
+                            <label class="text-muted small fw-bold text-uppercase d-block mb-1">Ghi chú đính kèm</label>
+                            <div class="p-3 bg-light rounded-4 border-start border-4 border-danger-subtle">
+                                <span class="text-dark">
+                                    @(string.IsNullOrEmpty(Model.Note) ? "Bản ghi này không có ghi chú." : Model.Note)
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* PHẦN PHỤ (4 cột): Metadata & Thao tác quyết định *@
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold mb-3 text-muted">Thông tin hệ thống</h6>
+
+                        <div class="mb-3">
+                            <label class="small text-muted fw-bold text-uppercase d-block">Mã số bản ghi</label>
+                            <div class="fw-bold text-primary">#@Model.Id</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="small text-muted fw-bold text-uppercase d-block">Ngày đặt lịch</label>
+                            <div class="fw-bold">@Model.BookingDate.ToString("dd/MM/yyyy HH:mm")</div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="small text-muted fw-bold text-uppercase d-block mb-2">Trạng thái hiện tại</label>
+                            <span class="badge rounded-pill px-3 py-2 @GetStatusClass(Model.Status)">
+                                @Model.Status
+                            </span>
+                        </div>
+
+                        <hr class="text-muted opacity-25">
+
+                        @* Nhóm nút thao tác chính *@
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger btn-lg rounded-3 fw-bold py-3 shadow">
+                                <i class="bi bi-trash3 me-1"></i> XÁC NHẬN XÓA
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary rounded-3">
+                                <i class="bi bi-x-circle me-1"></i> Hủy và quay lại
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                @* Tip an toàn *@
+                <div class="card border-0 shadow-sm rounded-4 bg-light p-3 border-start border-4 border-warning">
+                    <div class="small fw-bold mb-1">Kiểm tra kỹ?</div>
+                    <p class="small text-muted mb-0">Hãy chắc chắn rằng bạn đã liên hệ với cư dân trước khi xóa các yêu cầu đang ở trạng thái <strong>Pending</strong>.</p>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@functions {
+    string GetStatusClass(string status)
+    {
+        return status switch
+        {
+            "Pending" => "bg-warning text-dark",
+            "Approved" => "bg-primary text-white",
+            "Done" => "bg-success text-white",
+            "Cancelled" => "bg-secondary text-white",
+            _ => "bg-secondary text-white"
+        };
+    }
+}

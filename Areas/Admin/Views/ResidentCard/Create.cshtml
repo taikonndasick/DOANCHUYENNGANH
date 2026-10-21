@@ -1,0 +1,115 @@
+﻿@model QuanLyKTX.Models.ResidentCard
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+@{
+    ViewData["Title"] = "Cấp mới thẻ cư dân";
+}
+
+<div class="container py-4">
+    <div class="row">
+        @* Tiêu đề trang *@
+        <div class="col-12 mb-4">
+            <h3 class="fw-bold text-dark">
+                <i class="bi bi-card-checklist text-primary me-2"></i>Phát hành thẻ cư dân
+            </h3>
+            <p class="text-muted">Khởi tạo mã định danh và thiết lập thời hạn sử dụng thẻ cho cư dân tòa nhà.</p>
+        </div>
+    </div>
+
+    <form method="post">
+        @Html.AntiForgeryToken()
+
+        <div class="row">
+            @* PHẦN CHÍNH: Bên trái (Thông tin thẻ & Cư dân) *@
+            <div class="col-lg-8 mb-4">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-header bg-white border-0 pt-4 ps-4">
+                        <h5 class="fw-bold mb-0">Thông tin cơ bản</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label asp-for="CardCode" class="form-label fw-bold">
+                                    <i class="bi bi-qr-code me-1"></i> Mã số thẻ (UID)
+                                </label>
+                                <input asp-for="CardCode" class="form-control form-control-lg shadow-none border-2 bg-light"
+                                       placeholder="VD: SC-88991122" />
+                                <span asp-validation-for="CardCode" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="ResidentProfileId" class="form-label fw-bold">
+                                    <i class="bi bi-person-badge me-1"></i> Chủ sở hữu thẻ
+                                </label>
+                                <select asp-for="ResidentProfileId" class="form-select form-select-lg shadow-none border-2"
+                                        asp-items="@(ViewBag.Residents as SelectList)">
+                                    <option value="">-- Chọn cư dân cấp thẻ --</option>
+                                </select>
+                                <span asp-validation-for="ResidentProfileId" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="row mb-0">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label asp-for="IssueDate" class="form-label fw-bold">
+                                    <i class="bi bi-calendar-check me-1"></i> Ngày cấp thẻ
+                                </label>
+                                <input asp-for="IssueDate" type="date" class="form-control form-control-lg shadow-none border-2"
+                                       value="@(Model?.IssueDate.ToString("yyyy-MM-dd") ?? DateTime.Now.ToString("yyyy-MM-dd"))" />
+                                <span asp-validation-for="IssueDate" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="ExpiryDate" class="form-label fw-bold">
+                                    <i class="bi bi-calendar-x me-1"></i> Ngày hết hạn
+                                </label>
+                                <input asp-for="ExpiryDate" type="date" class="form-control form-control-lg shadow-none border-2"/>
+                                       value="@(Model?.ExpiryDate?.ToString("yyyy-MM-dd") ?? DateTime.Now.AddYears(2).ToString("yyyy-MM-dd"))"     
+                                       <span asp-validation-for="ExpiryDate" class="text-danger small"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* PHẦN PHỤ: Bên phải (Trạng thái & Thao tác) *@
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold mb-3 text-muted small text-uppercase">Cấu hình hệ thống</h6>
+
+                        <div class="mb-4">
+                            <label asp-for="Status" class="form-label small text-muted fw-bold">TRẠNG THÁI THẺ</label>
+                            <select asp-for="Status" class="form-select shadow-none bg-light border-0 fw-bold text-primary py-2">
+                                <option value="Active">🟢 Active (Hoạt động)</option>
+                                <option value="Inactive">🔴 Inactive (Tạm khóa)</option>
+                            </select>
+                        </div>
+
+                        <hr class="text-muted opacity-25">
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-3 fw-bold py-3 shadow">
+                                <i class="bi bi-plus-circle me-1"></i> XÁC NHẬN CẤP THẺ
+                            </button>
+                            <a asp-area="Admin" asp-controller="ResidentCard" asp-action="Index"
+                               class="btn btn-link text-secondary text-decoration-none small mt-2">
+                                <i class="bi bi-arrow-left me-1"></i> Quay lại danh sách
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                @* Widget thông tin *@
+                <div class="alert alert-info border-0 rounded-4 shadow-sm p-4">
+                    <h6 class="fw-bold"><i class="bi bi-info-circle me-2"></i>Quy định cấp thẻ</h6>
+                    <small class="d-block">Thẻ cư dân mặc định có thời hạn <strong>02 năm</strong> kể từ ngày cấp. Thẻ dùng để ra vào thang máy và các tiện ích công cộng.</small>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

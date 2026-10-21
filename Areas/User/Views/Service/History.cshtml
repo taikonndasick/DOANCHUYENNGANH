@@ -1,0 +1,71 @@
+@model IEnumerable<QuanLyKTX.Models.ServiceBooking>
+@{
+    ViewData["Title"] = "Lịch sử dịch vụ";
+    Layout = "_UserLayout";
+}
+
+<div class="container py-4">
+    <div class="card border-0 shadow-sm rounded-4 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <div>
+                <h4 class="fw-bold mb-1"><i class="bi bi-clock-history text-primary me-2"></i>Lịch sử đăng ký dịch vụ</h4>
+                <p class="text-muted mb-0">Theo dõi các dịch vụ/yêu cầu đã gửi.</p>
+            </div>
+            <a asp-action="Index" class="btn btn-outline-primary rounded-pill px-4">Quay lại dịch vụ</a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Ngày đăng ký</th>
+                        <th>Tên dịch vụ</th>
+                        <th>Ghi chú</th>
+                        <th>Trạng thái</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr><td colspan="4" class="text-center text-muted py-5">Chưa có lịch sử dịch vụ.</td></tr>
+                    }
+                    else
+                    {
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.BookingDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td class="fw-bold">@item.Service?.Name</td>
+                                <td class="small text-muted">@item.Note</td>
+                                <td>
+                                    @switch (item.Status)
+                                    {
+                                        case "PendingPayment":
+                                            <span class="badge bg-warning-subtle text-warning rounded-pill px-3">Chờ thanh toán</span>
+                                            break;
+                                        case "Pending":
+                                            <span class="badge bg-warning-subtle text-warning rounded-pill px-3">Chờ xử lý</span>
+                                            break;
+                                        case "Approved":
+                                        case "Active":
+                                            <span class="badge bg-success-subtle text-success rounded-pill px-3">Đã duyệt</span>
+                                            break;
+                                        case "Rejected":
+                                            <span class="badge bg-danger-subtle text-danger rounded-pill px-3">Từ chối</span>
+                                            break;
+                                        case "Cancelled":
+                                            <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3">Đã hủy</span>
+                                            break;
+                                        default:
+                                            <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3">@item.Status</span>
+                                            break;
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

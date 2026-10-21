@@ -1,0 +1,21 @@
+@{
+    ViewData["Title"] = "Bảng điều khiển";
+}
+<style>
+    .stat-card{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:1.5rem;transition:.25s;position:relative;height:100%;box-shadow:0 8px 22px rgba(15,76,129,.05)}
+    .stat-card:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(15,76,129,.1)}
+    .icon-box{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:1rem}.stat-value{font-size:1.8rem;font-weight:800;color:#0f172a}.stat-label{color:#64748b;font-weight:600}.main-card{background:#fff;border:1px solid #e2e8f0;border-radius:20px;box-shadow:0 8px 22px rgba(15,76,129,.05)}
+</style>
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2"><div><h3 class="fw-bold mb-1">Bảng điều khiển KTX</h3><p class="text-muted mb-0">Tổng quan nhanh hệ thống quản lý cư trú sinh viên.</p></div><a asp-area="Admin" asp-controller="Approval" asp-action="Index" class="btn btn-primary rounded-3"><i class="bi bi-hourglass-split"></i> Xem chờ duyệt</a></div>
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-md-6"><div class="stat-card"><div class="icon-box" style="background:#eef2ff;color:#4f46e5"><i class="bi bi-people"></i></div><div class="stat-value">@ViewBag.TotalResidents</div><div class="stat-label">Sinh viên đã duyệt</div><a asp-area="Admin" asp-controller="Resident" asp-action="Index" class="stretched-link"></a></div></div>
+        <div class="col-xl-3 col-md-6"><div class="stat-card"><div class="icon-box" style="background:#f0fdf4;color:#16a34a"><i class="bi bi-door-open"></i></div><div class="stat-value">@ViewBag.AvailableRooms</div><div class="stat-label">Phòng còn chỗ</div><a asp-area="Admin" asp-controller="Room" asp-action="Index" class="stretched-link"></a></div></div>
+        <div class="col-xl-3 col-md-6"><div class="stat-card"><div class="icon-box" style="background:#fffbeb;color:#d97706"><i class="bi bi-person-check"></i></div><div class="stat-value">@ViewBag.PendingRegistrations</div><div class="stat-label">Hồ sơ chờ duyệt</div><a asp-area="Admin" asp-controller="RegistrationRequest" asp-action="Index" class="stretched-link"></a></div></div>
+        <div class="col-xl-3 col-md-6"><div class="stat-card"><div class="icon-box" style="background:#fef2f2;color:#dc2626"><i class="bi bi-receipt"></i></div><div class="stat-value">@ViewBag.UnpaidInvoices</div><div class="stat-label">Hóa đơn chưa thanh toán</div><a asp-area="Admin" asp-controller="Invoice" asp-action="Index" class="stretched-link"></a></div></div>
+    </div>
+    <div class="row g-4">
+        <div class="col-lg-8"><div class="main-card p-4"><h5 class="fw-bold mb-3">Chi tiết nhanh</h5><div class="row g-3"><div class="col-md-4"><a asp-area="Admin" asp-controller="FormRequest" asp-action="Index" class="text-decoration-none"><div class="border rounded-4 p-3 h-100"><div class="text-muted small">Biểu mẫu chờ duyệt</div><div class="fw-bold fs-3 text-primary">@ViewBag.PendingForms</div></div></a></div><div class="col-md-4"><a asp-area="Admin" asp-controller="VehicleApproval" asp-action="Index" class="text-decoration-none"><div class="border rounded-4 p-3 h-100"><div class="text-muted small">Biển số chờ duyệt</div><div class="fw-bold fs-3 text-primary">@ViewBag.PendingVehicles</div></div></a></div><div class="col-md-4"><a asp-area="Admin" asp-controller="Vehicle" asp-action="Index" class="text-decoration-none"><div class="border rounded-4 p-3 h-100"><div class="text-muted small">Biển số đã duyệt</div><div class="fw-bold fs-3 text-primary">@ViewBag.TotalVehicles</div></div></a></div></div></div></div>
+        <div class="col-lg-4"><div class="main-card p-4"><h5 class="fw-bold mb-3">Thông báo mới nhất</h5>@if(ViewBag.RecentNotifications != null){foreach(var note in ViewBag.RecentNotifications){<div class="border-bottom py-2"><div class="fw-semibold text-truncate">@note.Title</div><small class="text-muted">@note.CreatedAt.ToString("dd/MM HH:mm")</small></div>}}else{<div class="text-muted">Chưa có thông báo.</div>}</div></div>
+    </div>
+</div>

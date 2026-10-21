@@ -1,0 +1,306 @@
+﻿@using QuanLyKTX.Models
+@model dynamic
+
+@{
+    ViewData["Title"] = "Bảng điều khiển sinh viên";
+    Layout = "_UserLayout";
+}
+
+<style>
+    :root {
+        --sapphire-primary: #0f4c81;
+        --sapphire-gradient: linear-gradient(135deg, #0f4c81 0%, #1a73e8 100%);
+    }
+
+    .welcome-banner {
+        background: var(--sapphire-gradient);
+        border-radius: 20px;
+        padding: 40px;
+        color: white;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 25px -5px rgba(15, 76, 129, 0.3);
+    }
+
+    .stat-card-user {
+        border: none;
+        border-radius: 16px;
+        transition: all 0.3s ease;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+    }
+
+        .stat-card-user:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 20px rgba(15, 76, 129, 0.08);
+            border-color: #cbd5e1;
+        }
+
+    .icon-shape {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        font-size: 24px;
+        margin-bottom: 15px;
+    }
+
+    .bg-sapphire-subtle {
+        background-color: rgba(15, 76, 129, 0.1);
+        color: var(--sapphire-primary);
+    }
+
+    .bg-rose-subtle {
+        background-color: #fff1f2;
+        color: #e11d48;
+    }
+
+    .event-card {
+        border-radius: 16px;
+        padding: 15px;
+        background: #fff;
+        border: 1px solid #f1f5f9;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        text-decoration: none;
+        color: inherit;
+        height: 100%;
+    }
+
+        .event-card:hover {
+            border-color: rgba(15, 76, 129, 0.2);
+            background: #fafafa;
+            transform: translateX(5px);
+        }
+
+    .event-date-box {
+        min-width: 60px;
+        height: 65px;
+        background: rgba(15, 76, 129, 0.05);
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: var(--sapphire-primary);
+        border: 1px solid rgba(15, 76, 129, 0.1);
+    }
+
+        .event-date-box .day {
+            font-size: 1.2rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .event-date-box .month {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+    .text-truncate-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .notification-list {
+        max-height: 420px;
+        overflow-y: auto;
+    }
+</style>
+
+<div class="container">
+    <div class="welcome-banner d-flex justify-content-between align-items-center">
+        <div>
+            <h2 class="fw-bold mb-2">Xin chào, @(ViewBag.FullName ?? "sinh viên")! 👋</h2>
+            <p class="mb-0 opacity-75">Chúc bạn một ngày tốt lành tại hệ thống KTX HUTECH.</p>
+        </div>
+        <div class="d-none d-md-block">
+            <i class="bi bi-buildings" style="font-size: 4rem; opacity: 0.2;"></i>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card stat-card-user p-4 text-decoration-none">
+                        <div class="icon-shape bg-rose-subtle">
+                            <i class="bi bi-wallet2"></i>
+                        </div>
+                        <h6 class="text-muted mb-1 fw-medium">Phí cần thanh toán</h6>
+                        <h3 class="fw-bold text-dark">@string.Format("{0:N0}", ViewBag.TotalUnpaid ?? 0) đ</h3>
+                        <a asp-area="User" asp-controller="Invoice" asp-action="Index"
+                           class="btn btn-sm btn-outline-danger mt-2 rounded-pill px-3">Thanh toán ngay</a>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card stat-card-user p-4">
+                        <div class="icon-shape bg-sapphire-subtle">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <h6 class="text-muted mb-1 fw-medium">Dịch vụ đang sử dụng</h6>
+                        <h3 class="fw-bold text-dark">@ViewBag.ActiveServices Dịch vụ</h3>
+                        <a asp-area="User" asp-controller="Service" asp-action="Index"
+                               class="btn btn-sm btn-outline-primary mt-2 rounded-pill px-3"
+                               style="color: var(--sapphire-primary); border-color: var(--sapphire-primary);">
+                            Xem chi tiết
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <h5 class="fw-bold mt-5 mb-4 text-dark">Sự kiện sắp tới</h5>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="event-card shadow-sm">
+                        <div class="event-date-box">
+                            <span class="day">15</span>
+                            <span class="month">Tháng 04</span>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1 text-dark">Sinh hoạt nội trú định kỳ</h6>
+                            <p class="text-muted small mb-0">
+                                <i class="bi bi-geo-alt me-1"></i>Sảnh sinh hoạt chung
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="event-card shadow-sm">
+                        <div class="event-date-box" style="color: #e11d48; background: #fff1f2;">
+                            <span class="day">20</span>
+                            <span class="month">Tháng 04</span>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1 text-dark">Vệ sinh và khử khuẩn khu vực KTX</h6>
+                            <p class="text-muted small mb-0">
+                                <i class="bi bi-clock me-1"></i>08:00 - 17:00
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="event-card shadow-sm">
+                        <div class="event-date-box" style="color: #10b981; background: #ecfdf5;">
+                            <span class="day">01</span>
+                            <span class="month">Tháng 05</span>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1 text-dark">Hoạt động sinh viên KTX</h6>
+                            <p class="text-muted small mb-0">
+                                <i class="bi bi-geo-alt me-1"></i>Khu vực sinh hoạt chung
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="event-card shadow-sm">
+                        <div class="event-date-box">
+                            <span class="day">10</span>
+                            <span class="month">Tháng 05</span>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1 text-dark">Kiểm tra PCCC phòng ở</h6>
+                            <p class="text-muted small mb-0">
+                                <i class="bi bi-shield-check me-1"></i>Toàn bộ khu KTX
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 h-100 border border-light">
+                <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0 text-dark">Thông báo mới</h5>
+                    <span class="badge rounded-pill"
+                          style="background-color: rgba(15, 76, 129, 0.1); color: var(--sapphire-primary);">
+                        Mới nhất
+                    </span>
+                </div>
+
+                <div class="card-body p-0 notification-list">
+                    <div class="list-group list-group-flush">
+                        @if (ViewBag.Notifications != null && ((List<Notification>)ViewBag.Notifications).Any())
+                        {
+                            foreach (var item in (List<Notification>)ViewBag.Notifications)
+                            {
+                                <a asp-area="User" asp-controller="Notification" asp-action="Details" asp-route-id="@item.Id"
+                                       class="list-group-item list-group-item-action p-3 border-0 border-bottom">
+                                    <div class="d-flex w-100 justify-content-between align-items-center mb-1">
+                                        <h6 class="mb-0 fw-bold text-dark text-truncate" style="max-width: 70%;">
+                                            @item.Title
+                                        </h6>
+                                        <small class="text-muted" style="font-size: 0.7rem;">
+                                            <i class="bi bi-clock me-1"></i>@GetTimeAgo(item.CreatedAt)
+                                        </small>
+                                    </div>
+
+                                    <p class="mb-0 text-muted small text-truncate-2">
+                                        @item.Content
+                                    </p>
+                                </a>
+                            }
+                        }
+                        else
+                        {
+                            <div class="p-5 text-center text-muted">
+                                <i class="bi bi-megaphone opacity-25 display-4"></i>
+                                <p class="mt-3 small">Hiện chưa có thông báo mới nào.</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="card-footer bg-white border-0 text-center py-3 mt-auto">
+                    <a asp-area="User" asp-controller="Notification" asp-action="Index"
+                           class="text-decoration-none small fw-bold"
+                           style="color: var(--sapphire-primary);">
+                        Xem tất cả thông báo <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    public string GetTimeAgo(DateTime dateTime)
+    {
+        var span = DateTime.Now - dateTime;
+
+        if (span.TotalDays > 31)
+        {
+            return dateTime.ToString("dd/MM/yyyy");
+        }
+
+        if (span.TotalDays >= 1)
+        {
+            return $"{(int)span.TotalDays} ngày trước";
+        }
+
+        if (span.TotalHours >= 1)
+        {
+            return $"{(int)span.TotalHours} giờ trước";
+        }
+
+        if (span.TotalMinutes >= 1)
+        {
+            return $"{(int)span.TotalMinutes} phút trước";
+        }
+
+        return "Vừa xong";
+    }
+}

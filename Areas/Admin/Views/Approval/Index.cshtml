@@ -1,0 +1,233 @@
+﻿@model QuanLyKTX.ViewModels.ApprovalDashboardViewModel
+@{
+    ViewData["Title"] = "Tổng quan chờ duyệt";
+}
+
+<style>
+    .approval-card {
+        border: 0;
+        border-radius: 18px;
+        box-shadow: 0 12px 35px rgba(15, 76, 129, .08);
+        transition: all .25s ease;
+        overflow: hidden;
+    }
+
+        .approval-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 18px 45px rgba(15, 76, 129, .14);
+        }
+
+    .approval-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.35rem;
+    }
+
+    .approval-number {
+        font-size: 2rem;
+        font-weight: 800;
+        line-height: 1;
+        color: #1e293b;
+    }
+
+    .approval-label {
+        color: #64748b;
+        font-size: .88rem;
+        font-weight: 600;
+    }
+
+    .approval-section-title {
+        font-size: 1rem;
+        font-weight: 800;
+        color: #1e293b;
+    }
+
+    .approval-list-item {
+        border: 1px solid #eef2f7;
+        border-radius: 14px;
+        padding: 14px 16px;
+        margin-bottom: 10px;
+        background: #fff;
+    }
+
+        .approval-list-item:hover {
+            background: #f8fafc;
+        }
+</style>
+
+<div class="app-content-header">
+    <div class="container-fluid">
+        <div class="row mb-3 align-items-center">
+            <div class="col-sm-8">
+                <h3 class="mb-1">
+                    <i class="bi bi-hourglass-split text-primary me-2"></i>Tổng quan chờ duyệt
+                </h3>
+                <p class="text-muted mb-0">
+                    Khu vực này chỉ dùng để xét duyệt. Danh sách sinh viên đã được duyệt vẫn nằm riêng ở mục Sinh viên.
+                </p>
+            </div>
+            <div class="col-sm-4 text-sm-end mt-3 mt-sm-0">
+                <span class="badge bg-warning-subtle text-warning px-3 py-2 rounded-pill">
+                    <i class="bi bi-clock-history me-1"></i>Tổng: @Model.TotalPending mục chờ duyệt
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <a asp-area="Admin" asp-controller="RegistrationRequest" asp-action="Index" class="text-decoration-none">
+                <div class="approval-card bg-white p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="approval-number">@Model.PendingStudentRegistrationCount</div>
+                            <div class="approval-label mt-2">Hồ sơ sinh viên chờ duyệt</div>
+                        </div>
+                        <div class="approval-icon bg-primary-subtle text-primary">
+                            <i class="bi bi-person-check-fill"></i>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-primary fw-semibold small">
+                        Vào duyệt hồ sơ <i class="bi bi-arrow-right ms-1"></i>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-4">
+            <a asp-area="Admin" asp-controller="FormRequest" asp-action="Index" class="text-decoration-none">
+                <div class="approval-card bg-white p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="approval-number">@Model.PendingFormCount</div>
+                            <div class="approval-label mt-2">Biểu mẫu / yêu cầu chờ xử lý</div>
+                        </div>
+                        <div class="approval-icon bg-info-subtle text-info">
+                            <i class="bi bi-ui-checks"></i>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-info fw-semibold small">
+                        Vào duyệt biểu mẫu <i class="bi bi-arrow-right ms-1"></i>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-4">
+            <a asp-area="Admin" asp-controller="VehicleApproval" asp-action="Index" class="text-decoration-none">
+                <div class="approval-card bg-white p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="approval-number">@Model.PendingVehicleCount</div>
+                            <div class="approval-label mt-2">Biển số xe chờ duyệt</div>
+                        </div>
+                        <div class="approval-icon bg-success-subtle text-success">
+                            <i class="bi bi-car-front-fill"></i>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-success fw-semibold small">
+                        Vào duyệt biển số <i class="bi bi-arrow-right ms-1"></i>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="card approval-card h-100">
+                <div class="card-body">
+                    <div class="approval-section-title mb-3">
+                        <i class="bi bi-person-check-fill text-primary me-2"></i>Hồ sơ sinh viên mới
+                    </div>
+
+                    @if (!Model.PendingStudentRegistrations.Any())
+                    {
+                        <div class="text-muted small">Không có hồ sơ sinh viên đang chờ duyệt.</div>
+                    }
+                    else
+                    {
+                        foreach (var item in Model.PendingStudentRegistrations)
+                        {
+                            <a asp-area="Admin" asp-controller="RegistrationRequest" asp-action="Details" asp-route-id="@item.Id" class="text-decoration-none text-dark">
+                                <div class="approval-list-item">
+                                    <div class="fw-bold">@item.Title</div>
+                                    <div class="text-muted small">@item.Subtitle</div>
+                                    <div class="mt-2">
+                                        <span class="badge bg-warning-subtle text-warning">@item.Status</span>
+                                    </div>
+                                </div>
+                            </a>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card approval-card h-100">
+                <div class="card-body">
+                    <div class="approval-section-title mb-3">
+                        <i class="bi bi-ui-checks text-info me-2"></i>Biểu mẫu / yêu cầu
+                    </div>
+
+                    @if (!Model.PendingForms.Any())
+                    {
+                        <div class="text-muted small">Không có biểu mẫu đang chờ xử lý.</div>
+                    }
+                    else
+                    {
+                        foreach (var item in Model.PendingForms)
+                        {
+                            <a asp-area="Admin" asp-controller="FormRequest" asp-action="Details" asp-route-id="@item.Id" class="text-decoration-none text-dark">
+                                <div class="approval-list-item">
+                                    <div class="fw-bold">@item.Title</div>
+                                    <div class="text-muted small">@item.Subtitle</div>
+                                    <div class="mt-2">
+                                        <span class="badge bg-warning-subtle text-warning">@item.Status</span>
+                                    </div>
+                                </div>
+                            </a>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card approval-card h-100">
+                <div class="card-body">
+                    <div class="approval-section-title mb-3">
+                        <i class="bi bi-car-front-fill text-success me-2"></i>Biển số xe
+                    </div>
+
+                    @if (!Model.PendingVehicles.Any())
+                    {
+                        <div class="text-muted small">Không có biển số xe đang chờ duyệt.</div>
+                    }
+                    else
+                    {
+                        foreach (var item in Model.PendingVehicles)
+                        {
+                            <a asp-area="Admin" asp-controller="VehicleApproval" asp-action="Index" asp-route-id="@item.Id" class="text-decoration-none text-dark">
+                                <div class="approval-list-item">
+                                    <div class="fw-bold">@item.Title</div>
+                                    <div class="text-muted small">@item.Subtitle</div>
+                                    <div class="mt-2">
+                                        <span class="badge bg-warning-subtle text-warning">@item.Status</span>
+                                    </div>
+                                </div>
+                            </a>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

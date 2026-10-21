@@ -1,0 +1,58 @@
+@{
+    ViewData["Title"] = "Điền biểu mẫu";
+    Layout = "_UserLayout";
+    var type = ViewBag.FormType as string ?? "Khác";
+    var suggestedTitle = ViewBag.SuggestedTitle as string ?? "Biểu mẫu sinh viên";
+    var defaultContent = ViewBag.DefaultContent as string ?? "";
+    var formTypes = ViewBag.FormTypes as IEnumerable<string> ?? new[] { "Khác" };
+    var template = ViewBag.Template as QuanLyKTX.Models.FormTemplate;
+}
+
+<div class="card page-card p-4 mx-auto" style="max-width:980px">
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+        <div>
+            <h3 class="page-title mb-1"><i class="bi bi-journal-plus text-primary me-2"></i>Điền biểu mẫu</h3>
+            <p class="text-muted mb-0">Thông tin gửi sẽ chuyển vào mục <strong>Duyệt biểu mẫu</strong> bên admin.</p>
+        </div>
+        <a asp-action="Submitted" class="btn btn-outline-primary rounded-pill"><i class="bi bi-clock-history me-1"></i> Biểu mẫu đã điền</a>
+    </div>
+
+    @if (template != null && !string.IsNullOrWhiteSpace(template.Description))
+    {
+        <div class="alert alert-primary-subtle border rounded-4 mb-3">
+            <div class="fw-bold"><i class="bi @(string.IsNullOrWhiteSpace(template.Icon) ? "bi-journal-text" : template.Icon) me-1"></i>@template.Name</div>
+            <div class="small text-muted">@template.Description</div>
+        </div>
+    }
+
+    <form method="post" enctype="multipart/form-data" class="row g-3">
+        @Html.AntiForgeryToken()
+        <div class="col-md-4">
+            <label class="form-label fw-bold">Loại biểu mẫu</label>
+            <select name="formType" class="form-select rounded-3">
+                @foreach (var option in formTypes.Where(x => x != "Tất cả"))
+                {
+                    <option value="@option" selected="@(option == type)">@option</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-8">
+            <label class="form-label fw-bold">Tiêu đề</label>
+            <input name="title" class="form-control rounded-3" value="@suggestedTitle" />
+        </div>
+        <div class="col-12">
+            <label class="form-label fw-bold">Nội dung biểu mẫu</label>
+            <textarea name="content" rows="16" class="form-control rounded-3" placeholder="Nhập nội dung biểu mẫu...">@defaultContent</textarea>
+            <div class="form-text">Sinh viên có thể chỉnh lại nội dung trước khi gửi. Với khai báo BHYT, nên đính kèm ảnh thẻ BHYT hoặc file PDF minh chứng.</div>
+        </div>
+        <div class="col-12">
+            <label class="form-label fw-bold">File minh chứng nếu có</label>
+            <input type="file" name="attachment" class="form-control rounded-3" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx" />
+            <div class="form-text">Chấp nhận hình ảnh, PDF, DOC hoặc DOCX.</div>
+        </div>
+        <div class="col-12 d-flex gap-2 flex-wrap">
+            <button class="btn btn-primary rounded-pill px-4"><i class="bi bi-send me-1"></i>Gửi biểu mẫu</button>
+            <a asp-action="Templates" class="btn btn-light rounded-pill px-4">Quay lại danh sách mẫu</a>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,151 @@
+﻿@model QuanLyKTX.Models.Payment
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+@{
+    ViewData["Title"] = "Cập nhật thanh toán #" + Model.TransferCode;
+}
+
+<div class="container py-4">
+    <div class="row">
+        @* Tiêu đề trang *@
+        <div class="col-12 mb-4">
+            <h3 class="fw-bold text-dark">
+                <i class="bi bi-pencil-square text-warning me-2"></i>Điều chỉnh giao dịch
+            </h3>
+            <p class="text-muted">Chỉnh sửa thông tin đối soát hoặc cập nhật trạng thái thực tế của giao dịch tài chính.</p>
+        </div>
+    </div>
+
+    <form method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="PaidAt" /> @* Giữ nguyên thời gian gốc *@
+        <input type="hidden" asp-for="InvoiceId" /> @* Không cho đổi hóa đơn để tránh sai lệch kế toán *@
+
+        <div class="row">
+            @* PHẦN CHÍNH: Bên trái (Thông tin tài chính) *@
+            <div class="col-lg-8 mb-4">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-header bg-white border-0 pt-4 ps-4">
+                        <h5 class="fw-bold mb-0">Nội dung chỉnh sửa</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-file-earmark-lock me-1"></i> Hóa đơn liên kết (Cố định)
+                            </label>
+                            <input class="form-control form-control-lg shadow-none border-2 bg-light text-muted fw-bold"
+                                   value="@Model.Invoice?.InvoiceCode - @Model.Invoice?.ResidentProfile?.FullName" disabled />
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label class="form-label fw-bold">
+                                    <i class="bi bi-currency-dollar me-1"></i> Số tiền thực nhận
+                                </label>
+                                <div class="input-group input-group-lg">
+                                    <input type="text" id="currencyInput" class="form-control shadow-none border-2 fw-bold text-danger border-end-0"
+                                           value="@Model.Amount.ToString("N0")" />
+                                    <span class="input-group-text bg-white border-2 border-start-0 fw-bold text-muted">VNĐ</span>
+                                </div>
+                                <input type="hidden" asp-for="Amount" id="hiddenAmount" />
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="PaymentMethod" class="form-label fw-bold">
+                                    <i class="bi bi-credit-card me-1"></i> Phương thức thanh toán
+                                </label>
+                                <select asp-for="PaymentMethod" class="form-select form-select-lg shadow-none border-2">
+                                    <option value="VietQR">VietQR (Chuyển khoản)</option>
+                                    <option value="MoMo">Ví MoMo</option>
+                                    <option value="Card">Thẻ Quốc tế</option>
+                                    <option value="Cash">Tiền mặt</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-0">
+                            <label asp-for="TransferCode" class="form-label fw-bold">
+                                <i class="bi bi-qr-code-scan me-1"></i> Mã giao dịch hệ thống (TID)
+                            </label>
+                            <input asp-for="TransferCode" class="form-control form-control-lg shadow-none border-2 fw-bold text-primary" />
+                            <span asp-validation-for="TransferCode" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* PHẦN PHỤ: Bên phải (Trạng thái & Thao tác) *@
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold mb-3 text-muted small text-uppercase">Xác thực lại giao dịch</h6>
+
+                        <div class="mb-4">
+                            <label asp-for="Status" class="form-label small text-muted fw-bold">TRẠNG THÁI MỚI</label>
+                            <select asp-for="Status" class="form-select shadow-none bg-light border-0 fw-bold text-primary py-2">
+                                <option value="Success">🟢 Success (Thành công)</option>
+                                <option value="Pending">🕒 Pending (Đang xử lý)</option>
+                                <option value="Failed">🔴 Failed (Thất bại)</option>
+                            </select>
+                        </div>
+
+                        <hr class="text-muted opacity-25">
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-warning btn-lg rounded-3 fw-bold py-3 shadow text-dark">
+                                <i class="bi bi-save me-1"></i> LƯU CẬP NHẬT
+                            </button>
+                            <a asp-action="Index" class="btn btn-link text-secondary text-decoration-none small mt-2">
+                                <i class="bi bi-x-circle me-1"></i> Hủy bỏ thay đổi
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                @* Widget cảnh báo *@
+                <div class="alert alert-warning border-0 rounded-4 shadow-sm p-4">
+                    <h6 class="fw-bold"><i class="bi bi-exclamation-triangle me-2"></i>Lưu ý kế toán</h6>
+                    <small class="d-block">Việc chỉnh sửa <strong>Số tiền</strong> hoặc <strong>Mã giao dịch</strong> có thể gây sai lệch với sao kê ngân hàng. Hãy kiểm tra kỹ chứng từ trước khi lưu.</small>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        const displayInput = document.getElementById('currencyInput');
+        const hiddenInput = document.getElementById('hiddenAmount');
+
+        displayInput.addEventListener('input', function (e) {
+            let value = e.target.value.replace(/\D/g, "");
+            hiddenInput.value = value;
+
+            if (value !== "") {
+                // Sử dụng vi-VN để đồng bộ dấu chấm phân cách hàng nghìn kiểu Việt Nam
+                e.target.value = new Intl.NumberFormat('vi-VN').format(value);
+            } else {
+                e.target.value = "";
+            }
+        });
+
+        displayInput.addEventListener('keypress', function (e) {
+            if (!/[0-9]/.test(e.key)) {
+                e.preventDefault();
+            }
+        });
+    </script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+<style>
+    .bg-light {
+        background-color: #f8fafc !important;
+    }
+
+    .text-primary {
+        color: #0f4c81 !important;
+    }
+</style>

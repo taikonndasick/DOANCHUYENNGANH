@@ -1,0 +1,177 @@
+@model List<QuanLyKTX.Models.ResidentProfile>
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{
+    ViewData["Title"] = "Danh sách sinh viên đã duyệt";
+    var keyword = ViewBag.Keyword as string ?? "";
+    var status = ViewBag.Status as string ?? "Tất cả";
+    var gender = ViewBag.Gender as string ?? "Tất cả";
+    var roomState = ViewBag.RoomState as string ?? "Tất cả";
+    int? buildingId = ViewBag.BuildingId as int?;
+    var currentPage = (int)(ViewBag.CurrentPage ?? 1);
+    var totalPages = (int)(ViewBag.TotalPages ?? 1);
+    var pageSize = (int)(ViewBag.PageSize ?? 50);
+    var totalCount = (int)(ViewBag.TotalCount ?? Model.Count);
+    var buildings = ViewBag.Buildings as SelectList;
+    var portraitPhotoPaths = ViewBag.PortraitPhotoPaths as Dictionary<string, string> ?? new Dictionary<string, string>();
+}
+
+<style>
+    .table-custom thead th { background-color: #f8f9fa; text-transform: uppercase; font-size: .75rem; letter-spacing: .5px; font-weight: 700; color: #475569; border-top: none; }
+    .btn-action { width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; }
+    .badge-student { padding: .5em .8em; font-weight: 600; border-radius: 6px; font-size: .8rem; }
+    .student-name { font-size: .95rem; color: #1e293b; }
+    .student-mini-photo { width: 52px; height: 68px; border-radius: 10px; object-fit: cover; border: 2px solid #e2e8f0; background: #f8fafc; }
+    .student-mini-fallback { width: 52px; height: 68px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; background: linear-gradient(135deg,#0f4c81,#1a73e8); color: #fff; font-weight: 800; }
+</style>
+
+<div class="card border-0 shadow-sm rounded-4">
+    <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+        <div>
+            <h5 class="fw-bold mb-1 text-dark"><i class="bi bi-people me-2 text-primary"></i>Danh sách sinh viên đã duyệt</h5>
+            <small class="text-muted">Tìm kiếm theo MSSV, họ tên, phòng, email, số điện thoại.</small>
+        </div>
+        <a asp-area="Admin" asp-controller="Resident" asp-action="Create" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm"><i class="bi bi-person-plus me-1"></i>Thêm sinh viên</a>
+    </div>
+
+    <div class="card-body border-top">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label small text-muted">Từ khóa</label>
+                <input name="keyword" value="@keyword" class="form-control rounded-3" placeholder="Họ tên, MSSV, email, phòng..." />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small text-muted">Trạng thái</label>
+                <select name="status" class="form-select rounded-3">
+                    <option value="Tất cả" selected="@(status == "Tất cả")">Tất cả</option>
+                    <option value="Đang ở" selected="@(status == "Đang ở")">Đang ở</option>
+                    <option value="Chưa ở" selected="@(status == "Chưa ở")">Chưa ở</option>
+                    <option value="Đã rời KTX" selected="@(status == "Đã rời KTX")">Đã rời KTX</option>
+                    <option value="Bị khóa" selected="@(status == "Bị khóa")">Bị khóa</option>
+                </select>
+            </div>
+            <div class="col-md-1">
+                <label class="form-label small text-muted">Giới tính</label>
+                <select name="gender" class="form-select rounded-3">
+                    <option value="Tất cả" selected="@(gender == "Tất cả")">Tất cả</option>
+                    <option value="Nam" selected="@(gender == "Nam")">Nam</option>
+                    <option value="Nữ" selected="@(gender == "Nữ")">Nữ</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small text-muted">Tòa</label>
+                <select name="buildingId" class="form-select rounded-3">
+                    <option value="">Tất cả</option>
+                    @if (buildings != null)
+                    {
+                        foreach (var b in buildings)
+                        {
+                            <option value="@b.Value" selected="@(buildingId?.ToString() == b.Value)">@b.Text</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small text-muted">Phòng ở</label>
+                <select name="roomState" class="form-select rounded-3">
+                    <option value="Tất cả" selected="@(roomState == "Tất cả")">Tất cả</option>
+                    <option value="Đã phân phòng" selected="@(roomState == "Đã phân phòng")">Đã phân phòng</option>
+                    <option value="Chưa phân phòng" selected="@(roomState == "Chưa phân phòng")">Chưa phân phòng</option>
+                </select>
+            </div>
+            <div class="col-md-1">
+                <label class="form-label small text-muted">Dòng</label>
+                <select name="pageSize" class="form-select rounded-3">
+                    <option value="50" selected="@(pageSize == 50)">50</option>
+                    <option value="100" selected="@(pageSize == 100)">100</option>
+                    <option value="200" selected="@(pageSize == 200)">200</option>
+                </select>
+            </div>
+            <div class="col-md-1 d-flex gap-2">
+                <button class="btn btn-primary rounded-3 flex-fill"><i class="bi bi-search"></i></button>
+                <a asp-action="Index" class="btn btn-outline-secondary rounded-3"><i class="bi bi-arrow-clockwise"></i></a>
+            </div>
+        </form>
+    </div>
+
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-custom align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th class="ps-4">ID</th><th>Họ tên sinh viên</th><th>MSSV</th><th>Giới tính</th><th>Lớp / Khoa</th><th>Phòng</th><th>Trạng thái</th><th class="text-center pe-4">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr><td colspan="8" class="text-center text-muted py-4"><i class="bi bi-inbox me-1"></i>Không có sinh viên phù hợp.</td></tr>
+                    }
+                    else
+                    {
+                        foreach (var item in Model)
+                        {
+                            var statusText = item.Status == "Active" ? "Đang ở" : item.Status;
+                            var statusClass = statusText switch { "Đang ở" => "bg-success-subtle text-success", "Chờ duyệt" => "bg-warning-subtle text-warning", "Chưa ở" => "bg-info-subtle text-info", "Đã rời KTX" => "bg-secondary-subtle text-secondary", _ => "bg-secondary-subtle text-secondary" };
+                            string? portraitPhotoPath = null;
+                            if (!string.IsNullOrWhiteSpace(item.UserId))
+                            {
+                                portraitPhotoPaths.TryGetValue(item.UserId, out portraitPhotoPath);
+                            }
+                            var initial = !string.IsNullOrWhiteSpace(item.FullName) ? item.FullName.Trim()[0].ToString().ToUpper() : "SV";
+                            <tr>
+                                <td class="ps-4 text-muted fw-bold">#@item.Id</td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-3">
+                                        @if (!string.IsNullOrWhiteSpace(portraitPhotoPath))
+                                        {
+                                            <img src="@portraitPhotoPath" alt="Ảnh thẻ @item.FullName" class="student-mini-photo" />
+                                        }
+                                        else
+                                        {
+                                            <span class="student-mini-fallback">@initial</span>
+                                        }
+                                        <div>
+                                            <div class="student-name fw-bold">@item.FullName</div>
+                                            <div class="small text-muted"><i class="bi bi-envelope me-1"></i>@(item.Email ?? "Chưa có email")</div>
+                                            <div class="small text-muted"><i class="bi bi-telephone me-1"></i>@(item.PhoneNumber ?? "Chưa có SĐT")</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="fw-semibold">@(item.StudentCode ?? "Chưa cập nhật")</span></td>
+                                <td>@(item.Gender ?? "-")</td>
+                                <td><div class="fw-semibold">@(item.ClassName ?? "Chưa cập nhật")</div><div class="small text-muted">@(item.Faculty ?? "Chưa cập nhật")</div></td>
+                                <td>
+                                    @if (item.Apartment != null)
+                                    {
+                                        <span class="badge bg-info-subtle text-info fw-bold"><i class="bi bi-building me-1"></i>@item.Apartment.ApartmentCode</span>
+                                        <div class="small text-muted">@(item.Apartment.Building?.Name ?? "")</div>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted small fst-italic">Chưa gắn phòng</span>
+                                    }
+                                </td>
+                                <td><span class="badge @statusClass badge-student"><i class="bi bi-house-check me-1"></i>@statusText</span></td>
+                                <td class="text-center pe-4">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-action btn-outline-info" title="Chi tiết"><i class="bi bi-eye"></i></a>
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-action btn-outline-warning" title="Sửa"><i class="bi bi-pencil"></i></a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card-footer bg-white border-0 py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <small class="text-muted">Hiển thị @Model.Count / @totalCount sinh viên</small>
+        <div class="btn-group btn-group-sm">
+            <a class="btn btn-outline-secondary @(currentPage <= 1 ? "disabled" : "")" asp-action="Index" asp-route-keyword="@keyword" asp-route-status="@status" asp-route-gender="@gender" asp-route-buildingId="@buildingId" asp-route-roomState="@roomState" asp-route-page="@(currentPage - 1)" asp-route-pageSize="@pageSize">Trước</a>
+            <span class="btn btn-light disabled">Trang @currentPage / @totalPages</span>
+            <a class="btn btn-outline-secondary @(currentPage >= totalPages ? "disabled" : "")" asp-action="Index" asp-route-keyword="@keyword" asp-route-status="@status" asp-route-gender="@gender" asp-route-buildingId="@buildingId" asp-route-roomState="@roomState" asp-route-page="@(currentPage + 1)" asp-route-pageSize="@pageSize">Sau</a>
+        </div>
+    </div>
+</div>

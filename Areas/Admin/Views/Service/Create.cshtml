@@ -1,0 +1,95 @@
+@model QuanLyKTX.Models.Service
+
+@{
+    ViewData["Title"] = "Thêm dịch vụ mới";
+}
+
+<div class="container py-4">
+    <div class="mb-4">
+        <h3 class="fw-bold text-dark"><i class="bi bi-box-seam-fill text-primary me-2"></i>Thêm dịch vụ KTX</h3>
+        <p class="text-muted mb-0">Chỉ thêm các khoản dịch vụ phát sinh. Tiền phòng được xử lý ở đăng ký cư trú.</p>
+    </div>
+
+    <form method="post">
+        @Html.AntiForgeryToken()
+        <div class="row">
+            <div class="col-lg-8 mb-4">
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-body p-4">
+                        <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                        <div class="mb-4">
+                            <label asp-for="Name" class="form-label fw-bold">Tên dịch vụ</label>
+                            <input asp-for="Name" class="form-control form-control-lg" placeholder="VD: Internet/WiFi, Gửi xe máy, Giặt sấy..." />
+                            <span asp-validation-for="Name" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Description" class="form-label fw-bold">Mô tả / đơn vị tính</label>
+                            <textarea asp-for="Description" class="form-control" rows="5" placeholder="VD: Đơn vị tính: tháng, lần, lượt, kWh, m3..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Price" class="form-label fw-bold">Đơn giá</label>
+                            <div class="input-group input-group-lg">
+                                <input type="text" id="PriceInput" class="form-control fw-bold text-primary" placeholder="Nhập số tiền" />
+                                <span class="input-group-text">VNĐ</span>
+                            </div>
+                            <input type="hidden" asp-for="Price" id="PriceHidden" />
+                            <span asp-validation-for="Price" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-body p-4">
+                        <label asp-for="Type" class="form-label fw-bold">Loại dịch vụ</label>
+                        <select asp-for="Type" class="form-select py-2 mb-3">
+                            <option value="Monthly">Tính vào hóa đơn tháng</option>
+                            <option value="Optional">Sinh viên đăng ký</option>
+                            <option value="Request">Yêu cầu xử lý</option>
+                        </select>
+                        <span asp-validation-for="Type" class="text-danger small"></span>
+
+                        <div class="alert alert-info rounded-4 small">
+                            <b>Gợi ý:</b><br />
+                            Monthly: điện, nước, wifi, vệ sinh chung.<br />
+                            Optional: gửi xe, giặt sấy, mượn phòng sinh hoạt.<br />
+                            Request: sửa chữa, phun khử khuẩn.
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-3 fw-bold">Lưu dịch vụ</button>
+                            <a asp-action="Index" class="btn btn-outline-secondary rounded-3">Quay lại</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const priceInput = document.getElementById('PriceInput');
+            const priceHidden = document.getElementById('PriceHidden');
+
+            function formatCurrency(val) {
+                if (!val) return "";
+                let cleanValue = val.toString().replace(/\D/g, "");
+                return new Intl.NumberFormat('vi-VN').format(cleanValue);
+            }
+
+            priceInput.addEventListener('input', function (e) {
+                let rawValue = e.target.value.replace(/\D/g, "");
+                priceHidden.value = rawValue || "0";
+                e.target.value = formatCurrency(rawValue);
+            });
+        });
+    </script>
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

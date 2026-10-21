@@ -1,0 +1,124 @@
+﻿@model IEnumerable<QuanLyKTX.Models.Invoice>
+@{
+    ViewData["Title"] = "Hóa đơn, biên lai";
+    Layout = "_UserLayout";
+}
+
+<style>
+    :root { --sapphire-primary: #0f4c81; }
+    .btn-sapphire { background-color: var(--sapphire-primary); color: white; border: none; }
+    .btn-sapphire:hover { background-color: #1a73e8; color: white; }
+    .badge-paid { background-color: rgba(25, 135, 84, 0.1); color: #198754; }
+    .badge-unpaid { background-color: rgba(220, 53, 69, 0.1); color: #dc3545; }
+    .badge-cancelled { background-color: rgba(108, 117, 125, 0.1); color: #6c757d; }
+</style>
+
+<div class="card border-0 shadow-sm rounded-4 p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="fw-bold m-0 text-dark">
+                <i class="bi bi-receipt-cutoff text-primary me-2"></i>Hóa đơn, biên lai
+            </h4>
+            <p class="text-muted small mb-0">Theo dõi hóa đơn nhận phòng, hóa đơn dịch vụ và thanh toán.</p>
+        </div>
+        <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">
+            Tổng số: @(Model?.Count() ?? 0)
+        </span>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show rounded-3 mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show rounded-3 mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th class="ps-3">Ngày tạo</th>
+                    <th>Mã hóa đơn</th>
+                    <th>Nội dung</th>
+                    <th>Số tiền</th>
+                    <th>Hạn thanh toán</th>
+                    <th>Trạng thái</th>
+                    <th class="text-end pe-3">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="ps-3">@item.CreatedAt.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                <span class="fw-bold text-primary">@item.InvoiceCode</span>
+                            </td>
+                            <td>
+                                <div class="fw-semibold text-dark">@(string.IsNullOrWhiteSpace(item.Description) ? "Hóa đơn ký túc xá" : item.Description)</div>
+                            </td>
+                            <td class="fw-bold text-dark">@item.TotalAmount.ToString("N0") đ</td>
+                            <td>@(item.DueDate.HasValue ? item.DueDate.Value.ToString("dd/MM/yyyy") : "-")</td>
+                            <td>
+                                @if (item.Status == "Paid")
+                                {
+                                    <span class="badge badge-paid px-3 py-2 rounded-pill">
+                                        <i class="bi bi-check-circle-fill me-1"></i> Đã thanh toán
+                                    </span>
+                                }
+                                else if (item.Status == "Cancelled")
+                                {
+                                    <span class="badge badge-cancelled px-3 py-2 rounded-pill">
+                                        <i class="bi bi-x-circle-fill me-1"></i> Đã hủy
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-unpaid px-3 py-2 rounded-pill">
+                                        <i class="bi bi-exclamation-circle-fill me-1"></i> Chưa thanh toán
+                                    </span>
+                                }
+                            </td>
+                            <td class="text-end pe-3">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                                        <i class="bi bi-eye"></i> Chi tiết
+                                    </a>
+
+                                    @if (item.Status != "Paid" && item.Status != "Cancelled")
+                                    {
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-sapphire rounded-pill px-3">
+                                            Chọn thanh toán
+                                        </a>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="7" class="text-center py-5">
+                            <div class="py-4">
+                                <i class="bi bi-receipt-cutoff display-1 text-light"></i>
+                                <p class="mt-3 fs-5 text-muted">Bạn hiện không có hóa đơn nào.</p>
+                                <a asp-area="User" asp-controller="Dashboard" asp-action="Index" class="btn btn-link text-decoration-none">Quay về trang chủ</a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

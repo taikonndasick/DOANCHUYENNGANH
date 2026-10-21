@@ -1,0 +1,164 @@
+@using QuanLyKTX.Models
+@model QuanLyKTX.Models.ResidentProfile?
+@{
+    ViewData["Title"] = "Thông tin lưu trú";
+    Layout = "_UserLayout";
+    var availableRooms = ViewBag.AvailableRooms as List<Apartment> ?? new List<Apartment>();
+    var pendingRoomRequest = ViewBag.PendingRoomRequest is bool b && b;
+    var allowedStartDates = ViewBag.AllowedStartDates as List<DateTime> ?? new List<DateTime>();
+
+    string GetAge(DateTime? birthDate)
+    {
+        if (birthDate == null) return "-";
+        var today = DateTime.Today;
+        var age = today.Year - birthDate.Value.Year;
+        if (birthDate.Value.Date > today.AddYears(-age)) age--;
+        return age.ToString();
+    }
+}
+
+<div class="card page-card p-4 mb-4">
+    <h3 class="page-title mb-1"><i class="bi bi-house-check text-primary me-2"></i>Thông tin lưu trú</h3>
+    <p class="text-muted">Thông tin tòa nhà, phòng ở, bạn cùng phòng và đăng ký phòng nếu sinh viên chưa được phân phòng.</p>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success rounded-4">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-warning rounded-4">@TempData["Error"]</div>
+    }
+
+    @if (Model == null)
+    {
+        <div class="alert alert-warning rounded-4">Tài khoản chưa được gắn với hồ sơ sinh viên.</div>
+    }
+    else
+    {
+        <div class="row g-3">
+            <div class="col-md-4"><div class="border rounded-4 p-4 bg-light h-100"><small class="text-muted">Tòa nhà</small><div class="fw-bold fs-5">@(Model.Apartment?.Building?.Name ?? "Chưa phân phòng")</div></div></div>
+            <div class="col-md-4"><div class="border rounded-4 p-4 bg-light h-100"><small class="text-muted">Phòng</small><div class="fw-bold fs-5">@(Model.Apartment?.ApartmentCode ?? "Chưa có")</div></div></div>
+            <div class="col-md-4"><div class="border rounded-4 p-4 bg-light h-100"><small class="text-muted">Loại phòng</small><div class="fw-bold fs-5">@(Model.Apartment?.ApartmentType ?? "-")</div></div></div>
+            <div class="col-md-4"><div class="border rounded-4 p-3 h-100"><small class="text-muted">Số lượng hiện tại</small><div>@(Model.Apartment == null ? "-" : $"{Model.Apartment.CurrentOccupancy}/{Model.Apartment.MaxOccupancy}")</div></div></div>
+            <div class="col-md-4"><div class="border rounded-4 p-3 h-100"><small class="text-muted">Giá phòng</small><div>@(Model.Apartment == null ? "-" : Model.Apartment.RoomPrice.ToString("N0") + " đ")</div></div></div>
+            <div class="col-md-4"><div class="border rounded-4 p-3 h-100"><small class="text-muted">Trạng thái sinh viên</small><div class="fw-bold text-primary">@Model.Status</div></div></div>
+        </div>
+    }
+</div>
+
+@if (Model != null && Model.Apartment == null)
+{
+    <div class="card page-card p-4 mb-4">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+            <div>
+                <h4 class="fw-bold mb-1"><i class="bi bi-door-open text-primary me-2"></i>Đăng ký phòng ở</h4>
+                <p class="text-muted mb-0">Sinh viên chưa được phân phòng có thể chọn phòng còn slot và gửi yêu cầu cho admin duyệt.</p>
+            </div>
+            <span class="badge bg-info-subtle text-primary rounded-pill px-3 py-2">@availableRooms.Count phòng còn slot</span>
+        </div>
+
+        @if (pendingRoomRequest)
+        {
+            <div class="alert alert-info rounded-4 mb-0">
+                Bạn đang có yêu cầu đăng ký phòng ở trạng thái <strong>Chờ duyệt</strong>. Vui lòng chờ admin xử lý trước khi gửi yêu cầu mới.
+            </div>
+        }
+        else if (!availableRooms.Any())
+        {
+            <div class="alert alert-warning rounded-4 mb-0">Hiện chưa có phòng trống để đăng ký.</div>
+        }
+        else
+        {
+            <form asp-area="User" asp-controller="Profile" asp-action="RegisterRoom" method="post" class="row g-3">
+                @Html.AntiForgeryToken()
+                <div class="col-lg-7">
+                    <label class="form-label fw-bold">Chọn phòng mong muốn</label>
+                    <select name="apartmentId" class="form-select rounded-3" required>
+                        <option value="">-- Chọn tòa nhà / phòng / slot còn trống --</option>
+                        @foreach (var room in availableRooms)
+                        {
+                            var remain = room.MaxOccupancy - room.CurrentOccupancy;
+                            <option value="@room.Id">
+                                @(room.Building?.Name ?? "Chưa có tòa") - Phòng @room.ApartmentCode - @room.ApartmentType - còn @remain slot - @room.RoomPrice.ToString("N0") đ/tháng
+                            </option>
+                        }
+                    </select>
+                    <div class="form-text">Sau khi gửi đăng ký, hệ thống sẽ tạo hóa đơn nhận phòng để sinh viên thanh toán.</div>
+                </div>
+                <div class="col-lg-5">
+                    <label class="form-label fw-bold">Đợt lưu trú</label>
+                    <select name="startDateOption" id="startDateOption" class="form-select rounded-3" required>
+                        <option value="">-- Chọn đợt vào KTX --</option>
+                        @foreach (var start in allowedStartDates)
+                        {
+                            <option value="@start.ToString("yyyy-MM-dd")" data-end="@start.AddYears(1).ToString("dd/MM/yyyy")">
+                                Từ @start.ToString("dd/MM/yyyy") đến @start.AddYears(1).ToString("dd/MM/yyyy")
+                            </option>
+                        }
+                    </select>
+                    <div class="form-text">Sinh viên chỉ được đăng ký theo kỳ 1 năm. Hết thời gian cần đăng ký/gia hạn lại.</div>
+                </div>
+                <div class="col-12">
+                    <label class="form-label fw-bold">Ghi chú</label>
+                    <textarea name="note" class="form-control rounded-3" rows="3" placeholder="Ví dụ: mong muốn ở cùng bạn, thời gian chuyển vào dự kiến..."></textarea>
+                </div>
+                <div class="col-12">
+                    <button class="btn btn-primary rounded-pill px-4">
+                        <i class="bi bi-send me-1"></i>Gửi đăng ký phòng và tạo hóa đơn
+                    </button>
+                </div>
+            </form>
+        }
+    </div>
+}
+
+@if (Model?.Apartment != null)
+{
+    var roommates = Model.Apartment.Residents?
+        .Where(x => x.Id != Model.Id && x.Status == "Đang ở")
+        .OrderBy(x => x.FullName)
+        .ToList() ?? new List<ResidentProfile>();
+
+    <div class="card page-card p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+            <div>
+                <h4 class="fw-bold mb-1"><i class="bi bi-people text-primary me-2"></i>Bạn cùng phòng</h4>
+                <p class="text-muted mb-0">Chỉ hiển thị các thông tin liên hệ cơ bản của sinh viên cùng phòng.</p>
+            </div>
+            <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">@roommates.Count bạn cùng phòng</span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table align-middle table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Họ tên</th>
+                        <th>Tuổi</th>
+                        <th>Trường</th>
+                        <th>Ngành/Khoa</th>
+                        <th>Email</th>
+                        <th>Số điện thoại</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in roommates)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@item.FullName</td>
+                            <td>@GetAge(item.DateOfBirth)</td>
+                            <td>HUTECH</td>
+                            <td>@(string.IsNullOrWhiteSpace(item.Faculty) ? item.ClassName : item.Faculty)</td>
+                            <td>@(string.IsNullOrWhiteSpace(item.Email) ? "-" : item.Email)</td>
+                            <td>@(string.IsNullOrWhiteSpace(item.PhoneNumber) ? "-" : item.PhoneNumber)</td>
+                        </tr>
+                    }
+                    @if (!roommates.Any())
+                    {
+                        <tr><td colspan="6" class="text-center text-muted py-5">Hiện chưa có thông tin bạn cùng phòng khác.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

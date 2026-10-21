@@ -1,0 +1,154 @@
+﻿@model QuanLyKTX.Models.Payment
+
+@{
+    ViewData["Title"] = "Chi tiết giao dịch #" + Model.TransferCode;
+}
+
+<div class="container py-4">
+    <div class="row">
+        @* Tiêu đề chính *@
+        <div class="col-12 mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="fw-bold text-dark">
+                        <i class="bi bi- receipt-cutoff text-primary me-2"></i>Thông tin giao dịch chi tiết
+                    </h3>
+                    <p class="text-muted">Dữ liệu đối soát tài chính từ hệ thống thanh toán điện tử.</p>
+                </div>
+                <div>
+                    <span class="badge @(Model.Status == "Success" ? "bg-success" : Model.Status == "Pending" ? "bg-warning text-dark" : "bg-danger") px-4 py-2 rounded-pill fs-6 shadow-sm">
+                        <i class="bi @(Model.Status == "Success" ? "bi-check-circle" : "bi-clock-history") me-1"></i>
+                        @Model.Status
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        @* CỘT TRÁI: Nội dung thanh toán *@
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-header bg-white border-0 pt-4 ps-4">
+                    <h5 class="fw-bold mb-0">Nội dung đối soát</h5>
+                </div>
+                <div class="card-body p-4">
+                    @* Khối 1: Hóa đơn & Số tiền *@
+                    <div class="row mb-4 border-bottom pb-3">
+                        <div class="col-sm-6 mb-3 mb-sm-0">
+                            <label class="text-muted small fw-bold text-uppercase">Liên kết hóa đơn</label>
+                            <p class="fs-5 fw-bold text-dark mb-0">#@Model.Invoice?.InvoiceCode</p>
+                            <small class="text-muted">Mã nội bộ: #@Model.InvoiceId</small>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="text-muted small fw-bold text-uppercase">Số tiền đã nộp</label>
+                            <p class="fs-4 fw-bold text-danger mb-0">@Model.Amount.ToString("N0") <small>VNĐ</small></p>
+                        </div>
+                    </div>
+
+                    @* Khối 2: Cư dân & Phương thức *@
+                    <div class="row mb-4 border-bottom pb-3">
+                        <div class="col-sm-6 mb-3 mb-sm-0">
+                            <label class="text-muted small fw-bold text-uppercase">Người thanh toán</label>
+                            <div class="d-flex align-items-center mt-1">
+                                <div class="bg-light p-2 rounded-circle me-3">
+                                    <i class="bi bi-person-fill text-secondary"></i>
+                                </div>
+                                <p class="fw-bold mb-0 text-primary">@Model.Invoice?.ResidentProfile?.FullName</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="text-muted small fw-bold text-uppercase">Phương thức giao dịch</label>
+                            <div class="mt-1">
+                                <span class="badge bg-info-subtle text-info-emphasis border border-info px-3 py-2">
+                                    <i class="bi bi-credit-card-2-front me-1"></i> @Model.PaymentMethod
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    @* Khối 3: Mã chuyển khoản *@
+                    <div class="p-3 bg-light rounded-3 border">
+                        <label class="text-muted small fw-bold text-uppercase d-block mb-1">Mã tham chiếu hệ thống (TID)</label>
+                        <code class="fs-5 fw-bold text-dark">@Model.TransferCode</code>
+                    </div>
+                </div>
+                <div class="card-footer bg-white border-0 pb-4 ps-4">
+                    <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
+                        <i class="bi bi-arrow-left me-1"></i> Quay lại
+                    </a>
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning rounded-pill px-4 ms-2 text-dark fw-bold">
+                        <i class="bi bi-pencil-square me-1"></i> Chỉnh sửa giao dịch
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        @* CỘT PHẢI: Thời gian & Chứng từ *@
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-4">
+                    <h6 class="fw-bold mb-4">Dấu mốc thời gian</h6>
+
+                    <div class="d-flex mb-4">
+                        <div class="text-primary me-3">
+                            <i class="bi bi-calendar-check fs-4"></i>
+                        </div>
+                        <div>
+                            <label class="text-muted small d-block">Thời điểm ghi nhận</label>
+                            <span class="fw-bold">@Model.PaidAt.ToString("dd/MM/yyyy")</span>
+                            <div class="small text-muted">@Model.PaidAt.ToString("HH:mm:ss")</div>
+                        </div>
+                    </div>
+
+                    <hr class="opacity-25">
+
+                    <div class="mt-4">
+                        <div class="p-3 rounded-4 bg-primary-subtle border border-primary-subtle text-primary">
+                            <h6 class="fw-bold mb-1 small"><i class="bi bi-shield-lock me-2"></i>Bảo mật thanh toán</h6>
+                            <p class="small mb-0 opacity-75">Giao dịch này được bảo mật và đối soát tự động bởi cổng thanh toán liên kết.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* Quick Action Alert *@
+            <div class="alert alert-secondary border-0 shadow-sm rounded-4 p-4 text-center">
+                <h6 class="fw-bold mb-3">In biên lai nhanh</h6>
+                <button onclick="window.print()" class="btn btn-dark btn-sm w-100 rounded-3 fw-bold py-2 shadow-sm">
+                    <i class="bi bi-printer me-1"></i> Xuất biên lai (PDF)
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-info-subtle {
+        background-color: rgba(13, 202, 240, 0.1) !important;
+    }
+
+    .text-info-emphasis {
+        color: #055160 !important;
+    }
+
+    .bg-primary-subtle {
+        background-color: rgba(15, 76, 129, 0.1) !important;
+    }
+
+    @@media print {
+        .btn, .card-footer, .alert, .badge {
+            display: none !important;
+        }
+
+        .container {
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+
+        .card {
+            border: 1px solid #eee !important;
+            box-shadow: none !important;
+        }
+    }
+</style>

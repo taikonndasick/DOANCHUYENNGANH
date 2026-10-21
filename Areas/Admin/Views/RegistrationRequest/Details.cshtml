@@ -1,0 +1,152 @@
+﻿@model QuanLyKTX.Models.StudentRegistration
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    string DocumentName(string type) => type switch
+    {
+        "CitizenId" => "Căn cước công dân / Căn cước",
+        "HealthInsurance" => "Thẻ bảo hiểm y tế",
+        "AdmissionProof" => "Minh chứng trúng tuyển / nhập học / thẻ sinh viên",
+        "PortraitPhoto" => "Ảnh thẻ chân dung",
+        _ => type
+    };
+}
+
+<div class="app-content-header">
+    <div class="container-fluid">
+        <div class="row align-items-center mb-3">
+            <div class="col-sm-8">
+                <h3><i class="bi bi-file-earmark-person text-primary me-2"></i>Chi tiết hồ sơ đăng ký</h3>
+                <div class="text-muted">Kiểm tra thông tin sinh viên, tài khoản ngân hàng và giấy tờ bắt buộc.</div>
+            </div>
+            <div class="col-sm-4 text-sm-end mt-3 mt-sm-0">
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Quay lại</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success"><i class="bi bi-check-circle me-1"></i>@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger"><i class="bi bi-exclamation-triangle me-1"></i>@TempData["ErrorMessage"]</div>
+}
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white">
+                <h5 class="card-title mb-0">Thông tin sinh viên</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6"><strong>Mã số sinh viên:</strong><br />@Model.StudentCode</div>
+                    <div class="col-md-6"><strong>Họ tên:</strong><br />@Model.FullName</div>
+                    <div class="col-md-4"><strong>Ngày sinh:</strong><br />@(Model.DateOfBirth?.ToString("dd/MM/yyyy") ?? "-")</div>
+                    <div class="col-md-4"><strong>Giới tính:</strong><br />@Model.Gender</div>
+                    <div class="col-md-4"><strong>Số căn cước:</strong><br />@Model.NationalId</div>
+                    <div class="col-md-6"><strong>Số điện thoại:</strong><br />@Model.PhoneNumber</div>
+                    <div class="col-md-6"><strong>Email:</strong><br />@Model.Email</div>
+                    <div class="col-md-12"><strong>Địa chỉ:</strong><br />@Model.Address</div>
+                    <div class="col-md-6"><strong>Lớp:</strong><br />@Model.ClassName</div>
+                    <div class="col-md-6"><strong>Khoa:</strong><br />@Model.Faculty</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white">
+                <h5 class="card-title mb-0">Thông tin tài khoản và ngân hàng</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4"><strong>Tên đăng nhập:</strong><br />@Model.Username</div>
+                    <div class="col-md-4"><strong>Số tài khoản:</strong><br />@Model.BankAccountNumber</div>
+                    <div class="col-md-4"><strong>Tên ngân hàng:</strong><br />@Model.BankName</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white">
+                <h5 class="card-title mb-0">Giấy tờ sinh viên đã tải lên</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    @foreach (var doc in Model.Documents)
+                    {
+                        <div class="col-md-4">
+                            <div class="border rounded-3 p-3 h-100 bg-light">
+                                <div class="fw-bold mb-2">@DocumentName(doc.DocumentType)</div>
+                                <div class="small text-muted mb-3 text-truncate">@doc.OriginalFileName</div>
+                                <a href="@doc.FilePath" target="_blank" class="btn btn-outline-primary btn-sm w-100">
+                                    <i class="bi bi-box-arrow-up-right"></i> Mở file
+                                </a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white">
+                <h5 class="card-title mb-0">Xét duyệt hồ sơ</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>Trạng thái hiện tại:</strong><br />
+                    @if (Model.Status == "Đã duyệt")
+                    {
+                        <span class="badge bg-success">Đã duyệt</span>
+                    }
+                    else if (Model.Status == "Từ chối")
+                    {
+                        <span class="badge bg-danger">Từ chối</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning text-dark">Chờ duyệt</span>
+                    }
+                </div>
+
+                <div class="small text-muted mb-3">
+                    Admin duyệt dựa trên thông tin sinh viên khai báo, số căn cước, mã số sinh viên, email, tài khoản ngân hàng và 4 giấy tờ bắt buộc: căn cước, BHYT, minh chứng trúng tuyển/nhập học/thẻ sinh viên, ảnh thẻ chân dung.
+                </div>
+
+                @if (Model.Status == "Chờ duyệt")
+                {
+                    <form asp-action="Approve" method="post" class="mb-3">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <button type="submit" class="btn btn-success w-100" onclick="return confirm('Duyệt hồ sơ và kích hoạt tài khoản sinh viên này?')">
+                            <i class="bi bi-check-circle"></i> Duyệt hồ sơ
+                        </button>
+                    </form>
+
+                    <form asp-action="Reject" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <label class="form-label fw-semibold">Lý do từ chối</label>
+                        <textarea name="rejectReason" class="form-control mb-2" rows="4" placeholder="Nhập lý do từ chối hồ sơ..."></textarea>
+                        <button type="submit" class="btn btn-danger w-100" onclick="return confirm('Từ chối hồ sơ này?')">
+                            <i class="bi bi-x-circle"></i> Từ chối hồ sơ
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <div class="alert alert-info mb-0">Hồ sơ này đã được xử lý.</div>
+                    @if (!string.IsNullOrWhiteSpace(Model.RejectReason))
+                    {
+                        <div class="mt-3"><strong>Lý do từ chối:</strong><br />@Model.RejectReason</div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>

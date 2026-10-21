@@ -1,0 +1,33 @@
+openapi: 3.0.3
+info:
+  title: KTX Management System API
+  description: Hợp đồng API chính thức giữa Backend (Codex) và Frontend (Antigravity)
+  version: 1.0.0
+servers:
+  - url: https://localhost:7001
+    description: Local Development Server
+paths:
+  /api/contracts/renewal-batches/current:
+    get:
+      summary: Lấy thông tin đợt gia hạn hợp đồng hiện tại đang mở
+      responses:
+        '200':
+          description: Thành công
+  /api/contracts/renew:
+    post:
+      summary: Sinh viên gửi yêu cầu gia hạn hợp đồng
+      responses:
+        '200':
+          description: Đã gửi yêu cầu thành công
+  /api/room-transfers/available-rooms:
+    get:
+      summary: Lấy danh sách các phòng cùng loại/mức giá còn chỗ trống
+      responses:
+        '200':
+          description: Thành công
+  /api/room-transfers/request:
+    post:
+      summary: Sinh viên gửi đơn xin chuyển phòng
+      responses:
+        '200':
+          description: Thành công

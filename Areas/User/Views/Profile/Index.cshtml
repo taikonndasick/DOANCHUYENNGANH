@@ -1,0 +1,628 @@
+@model QuanLyKTX.Models.ResidentProfile?
+@{
+    ViewData["Title"] = "Thong tin sinh vien";
+    Layout = "_UserLayout";
+
+    var portraitPhotoPath = ViewBag.PortraitPhotoPath as string;
+    var fullName = string.IsNullOrWhiteSpace(Model?.FullName) ? "Sinh vien KTX" : Model!.FullName.Trim();
+    var initial = !string.IsNullOrWhiteSpace(Model?.FullName) ? Model!.FullName.Trim()[0].ToString().ToUpper() : "SV";
+    var createdAt = Model?.CreatedAt.ToString("dd/MM/yyyy") ?? "-";
+}
+
+@functions {
+    private static string DisplayValue(string? value)
+    {
+        return string.IsNullOrWhiteSpace(value) ? "-" : value;
+    }
+}
+
+<style>
+    .student-profile-page {
+        display: grid;
+        gap: 20px;
+    }
+
+    .student-hero {
+        position: relative;
+        overflow: hidden;
+        display: grid;
+        grid-template-columns: minmax(230px, 310px) minmax(0, 1fr);
+        gap: 24px;
+        min-height: 300px;
+        padding: 24px;
+        border: 1px solid #dbeafe;
+        border-radius: 24px;
+        background:
+            linear-gradient(135deg, rgba(15, 76, 129, .96), rgba(26, 115, 232, .9)),
+            radial-gradient(circle at 92% 12%, rgba(255, 255, 255, .34), transparent 30%),
+            #0f4c81;
+        color: #fff;
+        box-shadow: 0 18px 45px rgba(15, 76, 129, .18);
+    }
+
+    .student-hero::after {
+        content: "";
+        position: absolute;
+        inset: auto -80px -120px auto;
+        width: 320px;
+        height: 320px;
+        border: 42px solid rgba(255, 255, 255, .12);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    .student-photo-panel {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        padding: 18px;
+        border: 1px solid rgba(255, 255, 255, .28);
+        border-radius: 20px;
+        background: rgba(255, 255, 255, .14);
+        backdrop-filter: blur(10px);
+    }
+
+    .student-photo-frame {
+        width: min(190px, 100%);
+        aspect-ratio: 3 / 4;
+        padding: 8px;
+        border-radius: 18px;
+        background: #fff;
+        box-shadow: 0 18px 38px rgba(15, 23, 42, .26);
+    }
+
+    .student-photo,
+    .student-photo-fallback {
+        width: 100%;
+        height: 100%;
+        border-radius: 12px;
+        object-fit: cover;
+        background: #e2e8f0;
+    }
+
+    .student-photo-fallback {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #e0f2fe, #f8fafc);
+        color: #0f4c81;
+        font-size: 3.25rem;
+        font-weight: 800;
+    }
+
+    .photo-caption {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 14px;
+        background: rgba(15, 23, 42, .2);
+        text-align: center;
+        font-size: .82rem;
+        font-weight: 700;
+    }
+
+    .portrait-upload-form {
+        width: 100%;
+        display: grid;
+        gap: 8px;
+    }
+
+    .portrait-file-input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+    }
+
+    .portrait-upload-button,
+    .portrait-save-button {
+        width: 100%;
+        min-height: 42px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border-radius: 14px;
+        font-weight: 800;
+        border: 1px solid rgba(255, 255, 255, .3);
+    }
+
+    .portrait-upload-button {
+        color: #fff;
+        background: rgba(255, 255, 255, .16);
+        cursor: pointer;
+        margin: 0;
+    }
+
+    .portrait-upload-button:hover {
+        background: rgba(255, 255, 255, .24);
+    }
+
+    .portrait-save-button {
+        color: #0f4c81;
+        background: #fff;
+    }
+
+    .portrait-help {
+        color: rgba(255, 255, 255, .72);
+        text-align: center;
+        font-size: .76rem;
+        font-weight: 700;
+    }
+
+    .student-hero-content {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-width: 0;
+        gap: 22px;
+    }
+
+    .student-kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        width: fit-content;
+        padding: 7px 12px;
+        border: 1px solid rgba(255, 255, 255, .35);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, .16);
+        font-size: .78rem;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+
+    .student-name {
+        margin: 12px 0 8px;
+        font-size: clamp(1.8rem, 3vw, 2.6rem);
+        font-weight: 800;
+        line-height: 1.12;
+    }
+
+    .student-summary {
+        max-width: 760px;
+        margin: 0;
+        color: rgba(255, 255, 255, .82);
+        font-weight: 500;
+    }
+
+    .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .hero-action {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 42px;
+        padding: 10px 16px;
+        border-radius: 12px;
+        font-weight: 800;
+        text-decoration: none;
+    }
+
+    .hero-action.primary {
+        background: #fff;
+        color: #0f4c81;
+    }
+
+    .hero-action.secondary {
+        border: 1px solid rgba(255, 255, 255, .35);
+        color: #fff;
+        background: rgba(255, 255, 255, .12);
+    }
+
+    .profile-stat-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .profile-stat {
+        min-height: 86px;
+        padding: 14px;
+        border: 1px solid rgba(255, 255, 255, .22);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, .14);
+        backdrop-filter: blur(8px);
+    }
+
+    .profile-stat span {
+        display: block;
+        color: rgba(255, 255, 255, .72);
+        font-size: .72rem;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+
+    .profile-stat strong {
+        display: block;
+        margin-top: 8px;
+        overflow-wrap: anywhere;
+        font-size: 1rem;
+        line-height: 1.25;
+    }
+
+    .profile-section-grid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 16px;
+    }
+
+    .profile-section {
+        grid-column: span 6;
+        border: 1px solid #e5edf5;
+        border-radius: 20px;
+        background: #fff;
+        box-shadow: 0 12px 30px rgba(15, 23, 42, .06);
+        overflow: hidden;
+    }
+
+    .profile-section.wide {
+        grid-column: span 12;
+    }
+
+    .section-head {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 18px 20px;
+        border-bottom: 1px solid #edf2f7;
+        background: #f8fbff;
+    }
+
+    .section-icon {
+        width: 42px;
+        height: 42px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 auto;
+        border-radius: 14px;
+        color: #fff;
+        background: linear-gradient(135deg, #0f4c81, #1a73e8);
+        box-shadow: 0 10px 20px rgba(15, 76, 129, .16);
+    }
+
+    .section-icon.green {
+        background: linear-gradient(135deg, #047857, #10b981);
+    }
+
+    .section-icon.amber {
+        background: linear-gradient(135deg, #b45309, #f59e0b);
+    }
+
+    .section-title {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 800;
+        color: #0f172a;
+    }
+
+    .section-subtitle {
+        margin: 2px 0 0;
+        color: #64748b;
+        font-size: .83rem;
+        font-weight: 600;
+    }
+
+    .info-list {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1px;
+        background: #edf2f7;
+    }
+
+    .info-item {
+        min-height: 92px;
+        padding: 16px 18px;
+        background: #fff;
+    }
+
+    .info-item.full {
+        grid-column: 1 / -1;
+    }
+
+    .info-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+        color: #64748b;
+        font-size: .74rem;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+
+    .info-value {
+        margin: 0;
+        color: #0f172a;
+        font-size: .98rem;
+        font-weight: 700;
+        line-height: 1.35;
+        overflow-wrap: anywhere;
+    }
+
+    .empty-profile {
+        display: grid;
+        place-items: center;
+        min-height: 360px;
+        padding: 36px 20px;
+        border: 1px dashed #cbd5e1;
+        border-radius: 22px;
+        background: #fff;
+        text-align: center;
+    }
+
+    .empty-profile-icon {
+        width: 76px;
+        height: 76px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 18px;
+        border-radius: 22px;
+        background: #eff6ff;
+        color: #0f4c81;
+        font-size: 2rem;
+    }
+
+    @@media (max-width: 1100px) {
+        .student-hero {
+            grid-template-columns: 1fr;
+        }
+
+        .student-photo-panel {
+            align-items: flex-start;
+            flex-direction: row;
+            justify-content: flex-start;
+        }
+
+        .student-photo-frame {
+            width: 136px;
+            flex: 0 0 136px;
+        }
+
+        .photo-caption {
+            align-self: center;
+            text-align: left;
+        }
+    }
+
+    @@media (max-width: 900px) {
+        .profile-stat-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .profile-section {
+            grid-column: span 12;
+        }
+    }
+
+    @@media (max-width: 620px) {
+        .student-hero {
+            padding: 18px;
+            border-radius: 20px;
+        }
+
+        .student-photo-panel {
+            display: block;
+            text-align: center;
+        }
+
+        .student-photo-frame {
+            width: 150px;
+            margin: 0 auto 14px;
+        }
+
+        .photo-caption {
+            text-align: center;
+        }
+
+        .profile-stat-grid,
+        .info-list {
+            grid-template-columns: 1fr;
+        }
+
+        .hero-action {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="student-profile-page">
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success rounded-4 mb-0"><i class="bi bi-check-circle-fill me-2"></i>@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-warning rounded-4 mb-0"><i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["Error"]</div>
+    }
+
+    @if (Model == null)
+    {
+        <section class="empty-profile">
+            <div>
+                <div class="empty-profile-icon"><i class="bi bi-person-exclamation"></i></div>
+                <h3 class="page-title mb-2">Ch&#432;a c&#243; h&#7891; s&#417; sinh vi&#234;n</h3>
+                <p class="text-muted mb-0">T&#224;i kho&#7843;n n&#224;y ch&#432;a &#273;&#432;&#7907;c g&#7855;n v&#7899;i h&#7891; s&#417; sinh vi&#234;n. Vui l&#242;ng ch&#7901; admin duy&#7879;t h&#7891; s&#417; &#273;&#259;ng k&#253;.</p>
+            </div>
+        </section>
+    }
+    else
+    {
+        <section class="student-hero">
+            <aside class="student-photo-panel">
+                <div class="student-photo-frame">
+                    @if (!string.IsNullOrWhiteSpace(portraitPhotoPath))
+                    {
+                        <img src="@portraitPhotoPath" alt="Anh the sinh vien @Model.FullName" class="student-photo" />
+                    }
+                    else
+                    {
+                        <div class="student-photo-fallback">@initial</div>
+                    }
+                </div>
+                <div class="photo-caption">
+                    <i class="bi bi-image me-1"></i>&#7842;nh th&#7867; sinh vi&#234;n
+                </div>
+                <form asp-action="UpdatePortraitPhoto" method="post" enctype="multipart/form-data" class="portrait-upload-form">
+                    @Html.AntiForgeryToken()
+                    <label for="portraitPhotoInput" class="portrait-upload-button">
+                        <i class="bi bi-camera"></i><span>&#272;&#7893;i &#7843;nh th&#7867;</span>
+                    </label>
+                    <input id="portraitPhotoInput" class="portrait-file-input" type="file" name="portraitPhoto" accept="image/png,image/jpeg,image/webp" required />
+                    <button type="submit" class="portrait-save-button">
+                        <i class="bi bi-cloud-arrow-up"></i><span>L&#432;u &#7843;nh m&#7899;i</span>
+                    </button>
+                    <small class="portrait-help">JPG, PNG ho&#7863;c WEBP, t&#7889;i &#273;a 5MB</small>
+                </form>
+            </aside>
+
+            <div class="student-hero-content">
+                <div>
+                    <span class="student-kicker"><i class="bi bi-person-badge"></i>H&#7891; s&#417; c&#432; tr&#250; KTX</span>
+                    <h2 class="student-name">@fullName</h2>
+                    <p class="student-summary">Th&#244;ng tin &#273;&#432;&#7907;c &#273;&#7891;ng b&#7897; sau khi ban qu&#7843;n l&#253; ph&#234; duy&#7879;t h&#7891; s&#417;. Sinh vi&#234;n c&#243; th&#7875; c&#7853;p nh&#7853;t th&#244;ng tin li&#234;n h&#7879; khi c&#243; thay &#273;&#7893;i.</p>
+                </div>
+
+                <div class="profile-stat-grid">
+                    <div class="profile-stat">
+                        <span>M&#227; s&#7889; sinh vi&#234;n</span>
+                        <strong>@DisplayValue(Model.StudentCode)</strong>
+                    </div>
+                    <div class="profile-stat">
+                        <span>Tr&#7841;ng th&#225;i</span>
+                        <strong>@DisplayValue(Model.Status)</strong>
+                    </div>
+                    <div class="profile-stat">
+                        <span>Khoa</span>
+                        <strong>@DisplayValue(Model.Faculty)</strong>
+                    </div>
+                    <div class="profile-stat">
+                        <span>Ng&#224;y t&#7841;o h&#7891; s&#417;</span>
+                        <strong>@createdAt</strong>
+                    </div>
+                </div>
+
+                <div class="hero-actions">
+                    <a asp-action="Settings" class="hero-action primary"><i class="bi bi-pencil-square"></i>C&#7853;p nh&#7853;t li&#234;n h&#7879;</a>
+                    <a asp-action="Residence" class="hero-action secondary"><i class="bi bi-house-check"></i>Xem l&#432;u tr&#250;</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="profile-section-grid">
+            <article class="profile-section">
+                <div class="section-head">
+                    <span class="section-icon"><i class="bi bi-person-lines-fill"></i></span>
+                    <div>
+                        <h3 class="section-title">Th&#244;ng tin c&#225; nh&#226;n</h3>
+                        <p class="section-subtitle">D&#7919; li&#7879;u &#273;&#7883;nh danh sinh vi&#234;n</p>
+                    </div>
+                </div>
+                <div class="info-list">
+                    <div class="info-item full">
+                        <span class="info-label"><i class="bi bi-person"></i>H&#7885; t&#234;n</span>
+                        <p class="info-value">@DisplayValue(Model.FullName)</p>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label"><i class="bi bi-calendar3"></i>Ng&#224;y sinh</span>
+                        <p class="info-value">@(Model.DateOfBirth?.ToString("dd/MM/yyyy") ?? "-")</p>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label"><i class="bi bi-gender-ambiguous"></i>Gi&#7899;i t&#237;nh</span>
+                        <p class="info-value">@DisplayValue(Model.Gender)</p>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label"><i class="bi bi-credit-card-2-front"></i>CCCD/CMND</span>
+                        <p class="info-value">@DisplayValue(Model.NationalId)</p>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label"><i class="bi bi-upc-scan"></i>MSSV</span>
+                        <p class="info-value">@DisplayValue(Model.StudentCode)</p>
+                    </div>
+                </div>
+            </article>
+
+            <article class="profile-section">
+                <div class="section-head">
+                    <span class="section-icon green"><i class="bi bi-telephone"></i></span>
+                    <div>
+                        <h3 class="section-title">Li&#234;n h&#7879;</h3>
+                        <p class="section-subtitle">K&#234;nh li&#234;n l&#7841;c khi c&#243; th&#244;ng b&#225;o</p>
+                    </div>
+                </div>
+                <div class="info-list">
+                    <div class="info-item">
+                        <span class="info-label"><i class="bi bi-phone"></i>S&#7889; &#273;i&#7879;n tho&#7841;i</span>
+                        <p class="info-value">@DisplayValue(Model.PhoneNumber)</p>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label"><i class="bi bi-envelope"></i>Email</span>
+                        <p class="info-value">@DisplayValue(Model.Email)</p>
+                    </div>
+                    <div class="info-item full">
+                        <span class="info-label"><i class="bi bi-geo-alt"></i>&#272;&#7883;a ch&#7881;</span>
+                        <p class="info-value">@DisplayValue(Model.Address)</p>
+                    </div>
+                </div>
+            </article>
+
+            <article class="profile-section wide">
+                <div class="section-head">
+                    <span class="section-icon amber"><i class="bi bi-mortarboard"></i></span>
+                    <div>
+                        <h3 class="section-title">H&#7885;c v&#7909; v&#224; tr&#7841;ng th&#225;i c&#432; tr&#250;</h3>
+                        <p class="section-subtitle">Th&#244;ng tin ph&#7909;c v&#7909; qu&#7843;n l&#253; k&#253; t&#250;c x&#225;</p>
+                    </div>
+                </div>
+                <div class="info-list">
+                    <div class="info-item">
+                        <span class="info-label"><i class="bi bi-people"></i>L&#7899;p</span>
+                        <p class="info-value">@DisplayValue(Model.ClassName)</p>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label"><i class="bi bi-building"></i>Khoa</span>
+                        <p class="info-value">@DisplayValue(Model.Faculty)</p>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label"><i class="bi bi-shield-check"></i>Tr&#7841;ng th&#225;i h&#7891; s&#417;</span>
+                        <p class="info-value">@DisplayValue(Model.Status)</p>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label"><i class="bi bi-clock-history"></i>Ng&#224;y t&#7841;o</span>
+                        <p class="info-value">@createdAt</p>
+                    </div>
+                </div>
+            </article>
+        </section>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        (() => {
+            const input = document.getElementById('portraitPhotoInput');
+            const label = document.querySelector('.portrait-upload-button span');
+
+            input?.addEventListener('change', () => {
+                const fileName = input.files?.[0]?.name;
+                if (fileName && label) {
+                    label.textContent = fileName.length > 24 ? `${fileName.slice(0, 21)}...` : fileName;
+                }
+            });
+        })();
+    </script>
+}

@@ -1,0 +1,52 @@
+@model QuanLyKTX.Models.ResidentProfile?
+@{
+    ViewData["Title"] = "Cài đặt";
+    Layout = "_UserLayout";
+}
+
+<div class="page-card p-4">
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+        <div>
+            <h3 class="page-title mb-1"><i class="bi bi-gear text-primary me-2"></i>Cài đặt tài khoản</h3>
+            <p class="text-muted mb-0">Cập nhật thông tin liên hệ dùng trong hồ sơ cư trú.</p>
+        </div>
+        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4"><i class="bi bi-arrow-left me-1"></i>Hồ sơ sinh viên</a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success rounded-4"><i class="bi bi-check-circle-fill me-2"></i>@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-warning rounded-4"><i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["Error"]</div>
+    }
+
+    @if (Model == null)
+    {
+        <div class="alert alert-warning rounded-4 mb-0">Tài khoản chưa có hồ sơ sinh viên chính thức.</div>
+    }
+    else
+    {
+        <form method="post" class="row g-3">
+            @Html.AntiForgeryToken()
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Số điện thoại</label>
+                <input name="phoneNumber" value="@Model.PhoneNumber" class="form-control form-control-lg rounded-3" placeholder="0901234567" maxlength="10" pattern="0[0-9]{9}" />
+                <small class="text-muted">Đúng 10 chữ số và bắt đầu bằng 0.</small>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Email</label>
+                <input type="email" name="email" value="@Model.Email" class="form-control form-control-lg rounded-3" placeholder="sinhvien@email.com" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Địa chỉ</label>
+                <input name="address" value="@Model.Address" class="form-control form-control-lg rounded-3" placeholder="Địa chỉ liên hệ" />
+            </div>
+            <div class="col-12 d-flex gap-2 flex-wrap">
+                <button class="btn btn-primary rounded-pill px-4"><i class="bi bi-save me-1"></i>Lưu thay đổi</button>
+                <a asp-action="Index" class="btn btn-link text-muted text-decoration-none">Hủy</a>
+            </div>
+        </form>
+    }
+</div>

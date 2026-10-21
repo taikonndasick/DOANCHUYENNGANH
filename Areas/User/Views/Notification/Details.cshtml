@@ -1,0 +1,70 @@
+﻿@model QuanLyKTX.Models.Notification
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<style>
+    /* Bo góc và đổ bóng cho khung xem PDF */
+    .pdf-viewer-container {
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid #dee2e6;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+</style>
+
+<div class="card shadow-sm border-0 rounded-4">
+    <div class="card-body p-4">
+        <h2 class="fw-bold text-dark">@Model.Title</h2>
+        <p class="text-muted small">
+            <i class="bi bi-calendar-event me-1"></i> Ngày đăng: @Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+        </p>
+        <hr />
+
+        @if (!string.IsNullOrEmpty(Model.ImagePath))
+        {
+            <div class="text-center mb-4">
+                <img src="@Model.ImagePath" class="img-fluid rounded-3 border" style="max-height:400px; object-fit: contain;">
+            </div>
+        }
+
+        <div class="mb-5" style="white-space: pre-line; line-height: 1.8; font-size: 1.1rem; color: #334155;">
+            @Model.Content
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.PdfPath))
+        {
+            <div class="mt-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0 text-primary">
+                        <i class="bi bi-file-earmark-pdf-fill me-2"></i>Nội dung tài liệu đính kèm
+                    </h5>
+                    <a href="@Model.PdfPath" download class="btn btn-danger btn-sm rounded-pill px-3">
+                        <i class="bi bi-download me-1"></i> Tải về máy
+                    </a>
+                </div>
+
+                <div class="pdf-viewer-container">
+                    <iframe src="@Model.PdfPath"
+                            width="100%"
+                            height="600px"
+                            style="border: none;">
+                        <p>
+                            Trình duyệt của bạn không hỗ trợ xem PDF trực tiếp.
+                            <a href="@Model.PdfPath">Nhấn vào đây để tải về.</a>
+                        </p>
+                    </iframe>
+                </div>
+                <div class="text-center mt-2">
+                    <small class="text-muted italic">Mẹo: Bạn có thể phóng to hoặc in tài liệu ngay trong khung xem trên.</small>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="card-footer bg-white border-top-0 p-4">
+        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
+            <i class="bi bi-arrow-left me-1"></i> Quay lại danh sách
+        </a>
+    </div>
+</div>

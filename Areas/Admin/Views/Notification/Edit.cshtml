@@ -1,0 +1,156 @@
+﻿@model QuanLyKTX.Models.Notification
+
+@{
+    ViewData["Title"] = "Chỉnh sửa thông báo: " + Model.Title;
+}
+
+<div class="container-fluid py-4">
+    <div class="row">
+        @* Tiêu đề trang *@
+        <div class="col-12 mb-4">
+            <h3 class="fw-bold text-dark">
+                <i class="bi bi-pencil-square text-warning me-2"></i>Cập nhật thông báo
+            </h3>
+            <p class="text-muted">Chỉnh sửa nội dung văn bản và quản lý các tệp đính kèm đa phương tiện.</p>
+        </div>
+    </div>
+
+    <form asp-action="Edit" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="ImagePath" />
+        <input type="hidden" asp-for="PdfPath" />
+        <input type="hidden" asp-for="CreatedAt" />
+
+        <div class="row g-4">
+            @* CỘT TRÁI: Soạn thảo nội dung *@
+            <div class="col-lg-7">
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-header bg-white border-0 pt-4 ps-4 d-flex justify-content-between">
+                        <h5 class="fw-bold mb-0">Nội dung văn bản</h5>
+                        <div class="form-check form-switch">
+                            <input asp-for="IsActive" class="form-check-input" type="checkbox" role="switch" id="activeSwitch">
+                            <label class="form-check-label small fw-bold" for="activeSwitch">Hiển thị</label>
+                        </div>
+                    </div>
+                    <div class="card-body p-4">
+                        <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                        <div class="mb-4">
+                            <label asp-for="Title" class="form-label fw-bold small text-uppercase text-muted">Tiêu đề bản tin</label>
+                            <input asp-for="Title" class="form-control form-control-lg shadow-none border-2 bg-light" />
+                            <span asp-validation-for="Title" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Content" class="form-label fw-bold small text-uppercase text-muted">Nội dung chi tiết</label>
+                            <textarea asp-for="Content" class="form-control shadow-none border-2 bg-light"
+                                      rows="12" placeholder="Nhập nội dung...">@Model.Content</textarea>
+                            <span asp-validation-for="Content" class="text-danger small"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold small text-uppercase text-muted">Thay đổi hình ảnh</label>
+                                <input type="file" name="imageFile" class="form-control shadow-none border-2 bg-light" accept="image/*" />
+                                <small class="text-muted italic">Tải lên file mới để thay thế ảnh hiện tại.</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white border-0 pb-4 ps-4">
+                        <button type="submit" class="btn btn-warning rounded-pill px-5 fw-bold shadow-sm text-dark">
+                            <i class="bi bi-save me-1"></i> LƯU THAY ĐỔI
+                        </button>
+                        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 ms-2">Hủy bỏ</a>
+                    </div>
+                </div>
+            </div>
+
+            @* CỘT PHẢI: Đối soát PDF & Preview *@
+            <div class="col-lg-5">
+                @* Preview PDF Hiện tại *@
+                <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+                    <div class="card-header bg-danger text-white py-3 border-0">
+                        <h6 class="card-title mb-0 fw-bold"><i class="bi bi-file-pdf me-2"></i>Tệp PDF hiện tại</h6>
+                    </div>
+                    <div class="card-body p-0 bg-secondary-subtle">
+                        @if (!string.IsNullOrEmpty(Model.PdfPath))
+                        {
+                            <iframe src="@Model.PdfPath#toolbar=0" class="w-100" style="height: 500px; border: none;"></iframe>
+                        }
+                        else
+                        {
+                            <div class="text-center py-5">
+                                <i class="bi bi-file-earmark-x display-4 text-muted opacity-25"></i>
+                                <p class="text-muted small mt-2">Chưa có tệp PDF đính kèm</p>
+                            </div>
+                        }
+                    </div>
+                    <div class="card-footer bg-white p-3 border-0">
+                        <label class="form-label fw-bold small text-uppercase text-muted d-block mb-2">Cập nhật tài liệu mới</label>
+                        <input type="file" name="pdfFile" class="form-control shadow-none border-2" accept=".pdf" />
+                    </div>
+                </div>
+
+                @* Thumbnail ảnh cũ *@
+                @if (!string.IsNullOrEmpty(Model.ImagePath))
+                {
+                    <div class="card border-0 shadow-sm rounded-4">
+                        <div class="card-body p-3 text-center">
+                            <h6 class="fw-bold small text-uppercase text-muted text-start mb-3">Ảnh minh họa hiện tại</h6>
+                            <img src="@Model.ImagePath" class="img-fluid rounded-3 border border-dashed p-1" style="max-height: 200px;" />
+                        </div>
+                    </div>
+                }
+
+                <div class="alert alert-warning border-0 rounded-4 shadow-sm p-4 mt-4">
+                    <h6 class="fw-bold small"><i class="bi bi-exclamation-triangle me-2"></i>Lưu ý hệ thống</h6>
+                    <small class="d-block">Khi thay đổi tệp đính kèm, các tệp cũ sẽ được hệ thống tự động dọn dẹp để tiết kiệm dung lượng sau khi bạn lưu thành công.</small>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+<style>
+    .rounded-4 {
+        border-radius: 1rem !important;
+    }
+
+    .bg-light {
+        background-color: #f8fafc !important;
+    }
+
+    .border-dashed {
+        border-style: dashed !important;
+    }
+
+    .form-switch .form-check-input {
+        width: 3em;
+        height: 1.5em;
+        cursor: pointer;
+    }
+
+    /* Đồng bộ màu sắc nút Warning của Sapphire */
+    .btn-warning {
+        background-color: #ffc107;
+        border: none;
+    }
+
+        .btn-warning:hover {
+            background-color: #e0a800;
+            transform: translateY(-1px);
+            transition: all 0.2s;
+        }
+
+    textarea {
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+</style>

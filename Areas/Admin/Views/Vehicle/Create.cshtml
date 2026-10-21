@@ -1,0 +1,110 @@
+﻿@model QuanLyKTX.Models.Vehicle
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+@{
+    ViewData["Title"] = "Thêm xe mới";
+}
+
+<div class="container py-4">
+    <div class="row">
+        @* Tiêu đề trang *@
+        <div class="col-12 mb-4">
+            <h3 class="fw-bold text-dark">
+                <i class="bi bi-plus-circle-fill text-primary me-2"></i>Đăng ký phương tiện mới
+            </h3>
+            <p class="text-muted">Khởi tạo thông tin phương tiện và gán quyền sở hữu cho cư dân trong hệ thống.</p>
+        </div>
+    </div>
+
+    <form method="post">
+        @Html.AntiForgeryToken()
+
+        <div class="row">
+            @* PHẦN CHÍNH: Bên trái (Thông tin phương tiện) *@
+            <div class="col-lg-8 mb-4">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-header bg-white border-0 pt-4 ps-4">
+                        <h5 class="fw-bold mb-0">Thông tin kỹ thuật</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label asp-for="LicensePlate" class="form-label fw-bold">
+                                    <i class="bi bi-card-text me-1"></i> Biển kiểm soát
+                                </label>
+                                <input asp-for="LicensePlate" class="form-control form-control-lg shadow-none border-2 bg-light"
+                                       placeholder="VD: 59A-123.45" />
+                                <span asp-validation-for="LicensePlate" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="VehicleType" class="form-label fw-bold">
+                                    <i class="bi bi-truck-flatbed me-1"></i> Loại phương tiện
+                                </label>
+                                <select asp-for="VehicleType" class="form-select form-select-lg shadow-none border-2">
+                                    <option value="">-- Chọn loại xe --</option>
+                                    <option value="Xe máy">Xe máy</option>
+                                    <option value="Ô tô">Ô tô</option>
+                                    <option value="Xe đạp điện">Xe đạp điện</option>
+                                </select>
+                                <span asp-validation-for="VehicleType" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-0">
+                            <label asp-for="ResidentProfileId" class="form-label fw-bold">
+                                <i class="bi bi-person-badge me-1"></i> Chủ sở hữu (Cư dân)
+                            </label>
+                            <select asp-for="ResidentProfileId" class="form-select form-select-lg shadow-none border-2"
+                                    asp-items="@(ViewBag.Residents as SelectList)">
+                                <option value="">-- Tìm và chọn cư dân --</option>
+                            </select>
+                            <span asp-validation-for="ResidentProfileId" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* PHẦN PHỤ: Bên phải (Trạng thái & Thao tác) *@
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold mb-3 text-muted small text-uppercase">Thiết lập hệ thống</h6>
+
+                        <div class="mb-4">
+                            <label asp-for="Status" class="form-label small text-muted fw-bold">TRẠNG THÁI BAN ĐẦU</label>
+                            <select asp-for="Status" class="form-select shadow-none bg-light border-0 fw-bold text-primary">
+                                <option value="Active">🟢 Active (Hoạt động)</option>
+                                <option value="Inactive">🔴 Inactive (Tạm khóa)</option>
+                                <option value="Pending">🕒 Pending (Chờ duyệt)</option>
+                            </select>
+                        </div>
+
+                        <hr class="text-muted opacity-25">
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-3 fw-bold py-3 shadow">
+                                <i class="bi bi-cloud-arrow-up me-1"></i> ĐĂNG KÝ PHƯƠNG TIỆN
+                            </button>
+                            <a asp-area="Admin" asp-controller="Vehicle" asp-action="Index"
+                               class="btn btn-link text-secondary text-decoration-none small mt-2">
+                                <i class="bi bi-arrow-left me-1"></i> Quay lại danh sách
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                @* Widget hướng dẫn *@
+                <div class="alert alert-warning border-0 rounded-4 shadow-sm p-4">
+                    <h6 class="fw-bold"><i class="bi bi-shield-lock me-2"></i>Quy định an ninh</h6>
+                    <small class="d-block">Sau khi đăng ký thành công, biển số xe sẽ được tự động đồng bộ với hệ thống camera nhận diện tại cổng chính.</small>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

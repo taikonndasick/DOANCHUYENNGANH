@@ -1,0 +1,113 @@
+﻿@model QuanLyKTX.Models.ServiceBooking
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+@{
+    ViewData["Title"] = "Tạo mới booking dịch vụ";
+}
+
+<div class="container py-4">
+    <div class="row">
+        @* Cột tiêu đề chính *@
+        <div class="col-12 mb-4">
+            <h3 class="fw-bold text-dark">
+                <i class="bi bi-plus-square-fill text-primary me-2"></i>Thiết lập Booking mới
+            </h3>
+            <p class="text-muted">Điền đầy đủ thông tin cư dân và dịch vụ để khởi tạo yêu cầu.</p>
+        </div>
+    </div>
+
+    <form method="post">
+        @Html.AntiForgeryToken()
+        <div class="row">
+            @* PHẦN CHÍNH: Bên trái *@
+            <div class="col-lg-8 mb-4">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-header bg-white border-0 pt-4 ps-4">
+                        <h5 class="fw-bold mb-0">Thông tin dịch vụ</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="mb-4">
+                            <label asp-for="ResidentProfileId" class="form-label fw-bold">
+                                <i class="bi bi-person me-1"></i> Cư dân yêu cầu
+                            </label>
+                            <select asp-for="ResidentProfileId" class="form-select form-select-lg shadow-none border-2"
+                                    asp-items="@(ViewBag.Residents as SelectList)">
+                                <option value="">-- Tìm chọn cư dân --</option>
+                            </select>
+                            <span asp-validation-for="ResidentProfileId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="ServiceId" class="form-label fw-bold">
+                                <i class="bi bi-tools me-1"></i> Loại dịch vụ
+                            </label>
+                            <select asp-for="ServiceId" class="form-select form-select-lg shadow-none border-2"
+                                    asp-items="@(ViewBag.Services as SelectList)">
+                                <option value="">-- Chọn loại dịch vụ cung cấp --</option>
+                            </select>
+                            <span asp-validation-for="ServiceId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-0">
+                            <label asp-for="Note" class="form-label fw-bold">
+                                <i class="bi bi-chat-left-text me-1"></i> Nội dung ghi chú
+                            </label>
+                            <textarea asp-for="Note" class="form-control shadow-none border-2" rows="6"
+                                      placeholder="Mô tả chi tiết yêu cầu của cư dân tại đây..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* PHẦN PHỤ (Widget): Bên phải *@
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold mb-3">Thời gian & Trạng thái</h6>
+
+                        <div class="mb-3">
+                            <label asp-for="BookingDate" class="form-label small text-muted fw-bold">NGÀY VÀ GIỜ HẸN</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-calendar3"></i></span>
+                                <input asp-for="BookingDate" type="datetime-local" class="form-control shadow-none border-start-0 bg-light"
+                                       value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
+                            </div>
+                            <span asp-validation-for="BookingDate" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Status" class="form-label small text-muted fw-bold">TRẠNG THÁI BAN ĐẦU</label>
+                            <select asp-for="Status" class="form-select shadow-none bg-light border-0 fw-bold text-primary">
+                                <option value="Pending">🕒 Pending</option>
+                                <option value="Approved">✅ Approved</option>
+                            </select>
+                        </div>
+
+                        <hr class="text-muted opacity-25">
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-3 fw-bold py-3 shadow">
+                                <i class="bi bi-check2-circle me-1"></i> XÁC NHẬN LƯU
+                            </button>
+                            <a asp-area="Admin" asp-controller="ServiceBooking" asp-action="Index" class="btn btn-link text-secondary text-decoration-none small mt-2">
+                                <i class="bi bi-x-circle me-1"></i> Hủy bỏ và quay lại
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                @* Tip nhỏ bổ trợ cho admin *@
+                <div class="alert alert-info border-0 rounded-4 shadow-sm p-4">
+                    <h6 class="fw-bold"><i class="bi bi-lightbulb me-2"></i>Mẹo nhỏ</h6>
+                    <small class="d-block mb-2">Hãy kiểm tra lịch trống của bộ phận kỹ thuật trước khi xác nhận trạng thái <strong>Approved</strong>.</small>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

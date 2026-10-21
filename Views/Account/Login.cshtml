@@ -1,0 +1,299 @@
+﻿@model QuanLyKTX.ViewModels.LoginViewModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <title>Đăng nhập Cư dân - KTX HUTECH</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --sapphire-primary: #0f4c81;
+            --sapphire-light: #1a73e8;
+            --sapphire-gradient: linear-gradient(135deg, #0f4c81 0%, #1a73e8 100%);
+            --font-family: 'Plus Jakarta Sans', sans-serif;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: var(--font-family);
+            background-color: #f8fafc;
+        }
+
+        .split-container {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        /* Bên trái: Hình ảnh Lifestyle */
+        .image-side {
+            flex: 1.2;
+            background: linear-gradient(rgba(15, 76, 129, 0.1), rgba(15, 76, 129, 0.3)), url('@Url.Content("~/login/images/bg-01.jpg")');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            display: none;
+        }
+
+            .image-side .overlay-content {
+                position: absolute;
+                bottom: 60px;
+                left: 60px;
+                color: white;
+                max-width: 500px;
+                text-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            }
+
+        /* Bên phải: Form */
+        .form-side {
+            flex: 1;
+            background-color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .login-box {
+            width: 100%;
+            max-width: 420px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .brand-logo {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+            .brand-logo h1 {
+                font-size: 28px;
+                font-weight: 800;
+                letter-spacing: -0.5px;
+                color: var(--sapphire-primary);
+                margin-bottom: 8px;
+            }
+
+        .portal-badge {
+            display: inline-block;
+            background: #eef2ff;
+            color: var(--sapphire-light);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+
+        /* Input Styles */
+        .form-group-custom {
+            margin-bottom: 20px;
+        }
+
+        .form-label-custom {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+            .input-wrapper i {
+                position: absolute;
+                left: 16px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: var(--text-muted);
+            }
+
+        .input-custom {
+            width: 100%;
+            height: 54px;
+            padding: 12px 15px 12px 48px;
+            font-size: 15px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 12px;
+            background-color: #f8fafc;
+            transition: all 0.25s ease;
+        }
+
+            .input-custom:focus {
+                outline: none;
+                border-color: var(--sapphire-light);
+                background-color: #fff;
+                box-shadow: 0 0 0 4px rgba(26, 115, 232, 0.1);
+            }
+
+        /* Button */
+        .btn-login-custom {
+            width: 100%;
+            height: 54px;
+            background: var(--sapphire-gradient);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            transition: all 0.3s;
+            margin-top: 10px;
+            box-shadow: 0 10px 15px -3px rgba(15, 76, 129, 0.2);
+        }
+
+            .btn-login-custom:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 20px 25px -5px rgba(15, 76, 129, 0.3);
+            }
+
+        .checkbox-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+
+        .remember-me {
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+            .remember-me input {
+                margin-right: 8px;
+                width: 18px;
+                height: 18px;
+                accent-color: var(--sapphire-primary);
+            }
+
+        .forgot-password {
+            color: var(--sapphire-light);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .other-links {
+            margin-top: 35px;
+            text-align: center;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+            .other-links a {
+                color: var(--sapphire-light);
+                text-decoration: none;
+                font-weight: 600;
+            }
+
+        .text-danger-custom {
+            background: #fff1f2;
+            color: #e11d48;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            border: 1px solid #ffe4e6;
+        }
+
+        @@media (min-width: 992px) {
+            .image-side {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="split-container">
+        <div class="image-side">
+            <div class="overlay-content">
+                <h2 class="display-5 fw-bold mb-3">Welcome Home.</h2>
+                <p class="fs-5 opacity-75">Trải nghiệm dịch vụ tiện ích thông minh ngay tại căn hộ KTX HUTECH của bạn.</p>
+            </div>
+        </div>
+
+        <div class="form-side">
+            <div class="login-box">
+                <div class="brand-logo text-center">
+                    <span class="portal-badge">Resident Portal</span>
+                    <h1>KTX HUTECH</h1>
+                    <p class="text-muted">Đăng nhập để quản lý căn hộ & dịch vụ</p>
+                </div>
+
+                <form asp-controller="Auth" asp-action="Login" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="ReturnUrl" />
+
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div asp-validation-summary="ModelOnly" class="text-danger-custom text-center shadow-sm"></div>
+                    }
+
+                    <div class="form-group-custom">
+                        <label class="form-label-custom">Tên đăng nhập / Email</label>
+                        <div class="input-wrapper">
+                            <i class="bi bi-person-circle"></i>
+                            <input asp-for="Username" class="input-custom" placeholder="Nhập tài khoản của bạn" required />
+                        </div>
+                        <span asp-validation-for="Username" class="text-danger text-sm"></span>
+                    </div>
+
+                    <div class="form-group-custom">
+                        <label class="form-label-custom">Mật khẩu</label>
+                        <div class="input-wrapper">
+                            <i class="bi bi-lock-fill"></i>
+                            <input asp-for="Password" class="input-custom" type="password" placeholder="••••••••" required />
+                        </div>
+                        <span asp-validation-for="Password" class="text-danger text-sm"></span>
+                    </div>
+
+                    <button type="submit" class="btn-login-custom">
+                        ĐĂNG NHẬP VÀO CỔNG CƯ DÂN
+                    </button>
+
+                    <div class="other-links">
+                        Chưa có tài khoản cư dân? <a asp-controller="Auth" asp-action="Register">Đăng ký ngay</a>
+                        <div class="mt-4 pt-3 border-top">
+                            <a asp-controller="Home" asp-action="Landing" class="text-muted fw-normal small">
+                                <i class="bi bi-arrow-left"></i> Trở lại trang giới thiệu
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <partial name="_ValidationScriptsPartial" />
+</body>
+</html>

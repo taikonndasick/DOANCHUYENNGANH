@@ -1,0 +1,129 @@
+﻿@model QuanLyKTX.Models.Notification
+
+@{
+    ViewData["Title"] = "Chi tiết thông báo: " + Model.Title;
+}
+
+<div class="container-fluid py-4">
+    <div class="row g-4">
+        @* CỘT TRÁI: Nội dung chi tiết *@
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-header bg-white border-0 pt-4 ps-4 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0 text-dark">
+                        <i class="bi bi- megaphone text-primary me-2"></i>Thông tin bản tin
+                    </h5>
+                    <span class="badge @(Model.IsActive ? "bg-success-subtle text-success" : "bg-secondary-subtle text-secondary") px-3 py-2 rounded-pill border">
+                        <i class="bi @(Model.IsActive ? "bi-eye" : "bi-eye-slash") me-1"></i>
+                        @(Model.IsActive ? "Đang hiển thị" : "Đang ẩn")
+                    </span>
+                </div>
+
+                <div class="card-body p-4">
+                    <h3 class="fw-bold text-dark mb-2">@Model.Title</h3>
+                    <div class="d-flex align-items-center text-muted mb-4 small">
+                        <span class="me-3"><i class="bi bi-calendar3 me-1"></i>@Model.CreatedAt.ToString("dd/MM/yyyy")</span>
+                        <span><i class="bi bi-clock me-1"></i>@Model.CreatedAt.ToString("HH:mm")</span>
+                    </div>
+
+                    <div class="p-3 bg-light rounded-4 mb-4 border-0 notification-content">
+                        @Model.Content
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.ImagePath))
+                    {
+                        <div class="mt-4">
+                            <h6 class="fw-bold mb-3 small text-uppercase text-muted">Hình ảnh minh họa</h6>
+                            <a href="@Model.ImagePath" target="_blank" class="d-block text-center bg-light rounded-4 p-2 border border-dashed">
+                                <img src="@Model.ImagePath" class="img-fluid rounded-3 shadow-sm" style="max-height: 450px; object-fit: contain;" alt="Notification Image" />
+                            </a>
+                        </div>
+                    }
+                </div>
+
+                <div class="card-footer bg-white border-0 pb-4 ps-4">
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning rounded-pill px-4 fw-bold shadow-sm">
+                        <i class="bi bi-pencil-square me-1"></i> Chỉnh sửa
+                    </a>
+                    <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 ms-2">
+                        <i class="bi bi-arrow-left me-1"></i> Quay lại
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        @* CỘT PHẢI: Xem trước PDF *@
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden">
+                <div class="card-header bg-danger text-white py-3 border-0">
+                    <h6 class="card-title mb-0 fw-bold d-flex align-items-center">
+                        <i class="bi bi-file-earmark-pdf-fill fs-5 me-2"></i>Văn bản đính kèm (PDF)
+                    </h6>
+                </div>
+
+                <div class="card-body p-0 d-flex flex-column">
+                    @if (!string.IsNullOrEmpty(Model.PdfPath))
+                    {
+                        <div class="flex-grow-1 bg-secondary-subtle">
+                            <iframe src="@Model.PdfPath#toolbar=0" class="w-100" style="height: 650px; border: none;"></iframe>
+                        </div>
+                        <div class="p-3 bg-white border-top">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="small">
+                                    <i class="bi bi-info-circle text-muted me-1"></i>
+                                    <span class="text-muted">Xem văn bản đầy đủ</span>
+                                </div>
+                                <a href="@Model.PdfPath" target="_blank" class="btn btn-sm btn-danger rounded-pill px-3 fw-bold">
+                                    <i class="bi bi-box-arrow-up-right me-1"></i>Mở toàn màn hình
+                                </a>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5 my-auto">
+                            <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 100px; height: 100px;">
+                                <i class="bi bi-file-earmark-x display-4 text-muted opacity-25"></i>
+                            </div>
+                            <h6 class="fw-bold text-muted">Không có tài liệu PDF</h6>
+                            <p class="text-muted small px-5">Thông báo này chỉ bao gồm nội dung văn bản và hình ảnh.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .rounded-4 {
+        border-radius: 1rem !important;
+    }
+
+    .bg-success-subtle {
+        background-color: rgba(25, 135, 84, 0.1) !important;
+    }
+
+    .bg-secondary-subtle {
+        background-color: rgba(108, 117, 125, 0.1) !important;
+    }
+
+    .border-dashed {
+        border-style: dashed !important;
+    }
+
+    .notification-content {
+        font-size: 1.05rem;
+        color: #334155;
+        line-height: 1.8;
+        white-space: pre-line;
+        border-left: 4px solid #0f4c81 !important;
+    }
+
+    /* Tối ưu hóa cho các thiết bị nhỏ */
+    @@media (max-width: 991.98px) {
+        iframe {
+            height: 500px !important;
+        }
+    }
+</style>

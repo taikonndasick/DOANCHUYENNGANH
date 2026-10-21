@@ -1,0 +1,143 @@
+﻿@model QuanLyKTX.Models.Service
+
+@{
+    ViewData["Title"] = "Chi tiết dịch vụ: " + Model.Name;
+}
+
+<div class="container py-4">
+    <div class="row">
+        @* Tiêu đề chính *@
+        <div class="col-12 mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="fw-bold text-dark">
+                        <i class="bi bi-info-square-fill text-primary me-2"></i>Thông tin dịch vụ chi tiết
+                    </h3>
+                    <p class="text-muted">Cấu hình giá cả, mô tả và hình thức vận hành của dịch vụ tiện ích.</p>
+                </div>
+                <div>
+                    <span class="badge @(Model.Type == "Monthly" ? "bg-info-subtle text-info" : "bg-warning-subtle text-warning") px-4 py-2 rounded-pill fs-6 border shadow-sm">
+                        <i class="bi @(Model.Type == "Monthly" ? "bi-calendar-range" : "bi-lightning-charge") me-1"></i>
+                        @Model.Type
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        @* CỘT TRÁI: Thông tin chính & Mô tả *@
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-header bg-white border-0 pt-4 ps-4">
+                    <h5 class="fw-bold mb-0">Hồ sơ dịch vụ</h5>
+                </div>
+                <div class="card-body p-4">
+                    @* Khối 1: Tên & Giá *@
+                    <div class="row mb-4 border-bottom pb-3">
+                        <div class="col-sm-6 mb-3 mb-sm-0">
+                            <label class="text-muted small fw-bold text-uppercase">Tên dịch vụ hiển thị</label>
+                            <p class="fs-5 fw-bold text-primary mb-0">@Model.Name</p>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="text-muted small fw-bold text-uppercase">Đơn giá niêm yết</label>
+                            <p class="fs-4 fw-bold text-danger mb-0">@Model.Price.ToString("N0") <small>VNĐ</small></p>
+                        </div>
+                    </div>
+
+                    @* Khối 2: Mô tả *@
+                    <div class="mb-2">
+                        <label class="text-muted small fw-bold text-uppercase mb-2 d-block">Mô tả dịch vụ</label>
+                        <div class="p-3 bg-light rounded-3 border" style="min-height: 150px; white-space: pre-line;">
+                            @if (!string.IsNullOrEmpty(Model.Description))
+                            {
+                                <span class="text-dark">@Model.Description</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted italic small">Không có mô tả cho dịch vụ này.</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                @* Footer nút bấm *@
+                <div class="card-footer bg-white border-0 pb-4 ps-4">
+                    <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
+                        <i class="bi bi-arrow-left me-1"></i> Quay lại
+                    </a>
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary rounded-pill px-4 ms-2 fw-bold shadow-sm">
+                        <i class="bi bi-pencil-square me-1"></i> Chỉnh sửa dịch vụ
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        @* CỘT PHẢI: Quy tắc & Widget hỗ trợ *@
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-4">
+                    <h6 class="fw-bold mb-4">Đặc tính vận hành</h6>
+
+                    <div class="d-flex mb-4">
+                        <div class="bg-primary-subtle p-2 rounded-3 me-3">
+                            <i class="bi bi-calculator fs-4 text-primary"></i>
+                        </div>
+                        <div>
+                            <label class="text-muted small d-block">Cách thức tính phí</label>
+                            <span class="fw-bold">@(Model.Type == "Monthly" ? "Định kỳ hàng tháng" : "Thu phí một lần")</span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex mb-4">
+                        <div class="bg-info-subtle p-2 rounded-3 me-3">
+                            <i class="bi bi-tags fs-4 text-info"></i>
+                        </div>
+                        <div>
+                            <label class="text-muted small d-block">Mã định danh</label>
+                            <span class="fw-bold">#SV-@Model.Id</span>
+                        </div>
+                    </div>
+
+                    <hr class="opacity-25">
+
+                    <div class="mt-4">
+                        <div class="p-3 rounded-4 bg-light border border-dashed text-center">
+                            <p class="small text-muted mb-0">
+                                <i class="bi bi-eye me-1"></i> Dịch vụ này đang được hiển thị công khai trên ứng dụng cư dân.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* Quick Tip Alert *@
+            <div class="alert alert-primary border-0 shadow-sm rounded-4 p-4">
+                <h6 class="fw-bold mb-2"><i class="bi bi-lightbulb me-2"></i>Mẹo nhỏ cho Admin</h6>
+                <small class="d-block opacity-75">Nếu bạn thay đổi <strong>Đơn giá</strong>, giá mới sẽ chỉ áp dụng cho các lượt đăng ký từ thời điểm này trở đi.</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-info-subtle {
+        background-color: rgba(13, 202, 240, 0.1) !important;
+    }
+
+    .bg-warning-subtle {
+        background-color: rgba(255, 193, 7, 0.1) !important;
+    }
+
+    .bg-primary-subtle {
+        background-color: rgba(15, 76, 129, 0.1) !important;
+    }
+
+    .border-dashed {
+        border-style: dashed !important;
+    }
+
+    .text-dark {
+        color: #1e293b !important;
+    }
+</style>

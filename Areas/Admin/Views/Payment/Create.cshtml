@@ -1,0 +1,128 @@
+﻿@model QuanLyKTX.Models.Payment
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+@{
+    ViewData["Title"] = "Ghi nhận thanh toán";
+}
+
+<div class="container py-4">
+    <div class="row">
+        @* Tiêu đề trang *@
+        <div class="col-12 mb-4">
+            <h3 class="fw-bold text-dark">
+                <i class="bi bi-cash-stack text-primary me-2"></i>Ghi nhận giao dịch mới
+            </h3>
+            <p class="text-muted">Cập nhật lịch sử thanh toán từ các cổng giao dịch ngoại vi vào hệ thống quản lý.</p>
+        </div>
+    </div>
+
+    <form method="post">
+        @Html.AntiForgeryToken()
+
+        <div class="row">
+            @* PHẦN CHÍNH: Bên trái (Thông tin hóa đơn & Giao dịch) *@
+            <div class="col-lg-8 mb-4">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-header bg-white border-0 pt-4 ps-4">
+                        <h5 class="fw-bold mb-0">Chi tiết thanh toán</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="mb-4">
+                            <label asp-for="InvoiceId" class="form-label fw-bold">
+                                <i class="bi bi-file-earmark-medical me-1"></i> Hóa đơn thanh toán
+                            </label>
+                            <select asp-for="InvoiceId" class="form-select form-select-lg shadow-none border-2 bg-light"
+                                    asp-items="@(ViewBag.Invoices as SelectList)">
+                                <option value="">-- Chọn mã hóa đơn đối soát --</option>
+                            </select>
+                            <span asp-validation-for="InvoiceId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label asp-for="PaymentMethod" class="form-label fw-bold">
+                                    <i class="bi bi-credit-card me-1"></i> Phương thức
+                                </label>
+                                <select asp-for="PaymentMethod" class="form-select form-select-lg shadow-none border-2">
+                                    <option value="VietQR">VietQR (Chuyển khoản)</option>
+                                    <option value="MoMo">Ví MoMo</option>
+                                    <option value="Card">Thẻ Quốc tế (Visa/Master)</option>
+                                    <option value="Cash">Tiền mặt tại quầy</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="TransferCode" class="form-label fw-bold">
+                                    <i class="bi bi-qr-code-scan me-1"></i> Mã giao dịch (TID)
+                                </label>
+                                <input asp-for="TransferCode" class="form-control form-control-lg shadow-none border-2 fw-bold text-primary"
+                                       placeholder="VD: MOMO12345678" />
+                                <span asp-validation-for="TransferCode" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="p-3 bg-primary-subtle rounded-3 border border-primary-subtle">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-shield-check fs-4 text-primary me-3"></i>
+                                <small class="text-primary fw-medium">
+                                    Lưu ý: Hệ thống sẽ tự động gạch nợ và chuyển trạng thái Hóa đơn sang <strong>"Đã thanh toán"</strong> nếu giao dịch được xác nhận thành công.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* PHẦN PHỤ: Bên phải (Trạng thái & Thao tác) *@
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold mb-3 text-muted small text-uppercase">Xác thực giao dịch</h6>
+
+                        <div class="mb-4">
+                            <label asp-for="Status" class="form-label small text-muted fw-bold">TRẠNG THÁI</label>
+                            <select asp-for="Status" class="form-select shadow-none bg-light border-0 fw-bold text-primary py-2">
+                                <option value="Success">🟢 Success (Thành công)</option>
+                                <option value="Pending">🕒 Pending (Đang xử lý)</option>
+                                <option value="Failed">🔴 Failed (Thất bại)</option>
+                            </select>
+                        </div>
+
+                        <hr class="text-muted opacity-25">
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-3 fw-bold py-3 shadow">
+                                <i class="bi bi-check-circle me-1"></i> XÁC NHẬN GIAO DỊCH
+                            </button>
+                            <a asp-area="Admin" asp-controller="Payment" asp-action="Index"
+                               class="btn btn-link text-secondary text-decoration-none small mt-2">
+                                <i class="bi bi-arrow-left me-1"></i> Quay lại danh sách
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                @* Widget thông tin *@
+                <div class="alert alert-info border-0 rounded-4 shadow-sm p-4">
+                    <h6 class="fw-bold"><i class="bi bi-info-circle me-2"></i>Đối soát tài chính</h6>
+                    <small class="d-block mb-2">Mã giao dịch là thông tin bắt buộc để đối chiếu với sao kê ngân hàng hoặc ví điện tử.</small>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+<style>
+    .bg-primary-subtle {
+        background-color: rgba(15, 76, 129, 0.1) !important;
+    }
+
+    .text-primary {
+        color: #0f4c81 !important;
+    }
+</style>

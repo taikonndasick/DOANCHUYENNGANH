@@ -1,0 +1,40 @@
+@model IEnumerable<QuanLyKTX.Models.StudentRequestForm>
+@{
+    ViewData["Title"] = "Duyệt biểu mẫu";
+    Layout = "_AdminLayout";
+    var status = ViewBag.Status as string ?? "Chờ duyệt";
+}
+<div class="container-fluid py-3">
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h4 class="fw-bold mb-1"><i class="bi bi-journal-check me-2 text-primary"></i>Duyệt biểu mẫu sinh viên</h4>
+                    <p class="text-muted mb-0">Biểu mẫu sinh viên gửi sẽ vào đây để admin duyệt/xử lý.</p>
+                </div>
+            </div>
+            <form method="get" class="row g-2 mb-3">
+                <div class="col-md-3">
+                    <select name="status" class="form-select rounded-3">
+                        <option selected="@(status=="Chờ duyệt")">Chờ duyệt</option>
+                        <option selected="@(status=="Đã duyệt")">Đã duyệt</option>
+                        <option selected="@(status=="Từ chối")">Từ chối</option>
+                        <option selected="@(status=="Tất cả")">Tất cả</option>
+                    </select>
+                </div>
+                <div class="col-md-5"><input name="keyword" value="@ViewBag.Keyword" class="form-control rounded-3" placeholder="Tìm theo sinh viên, loại biểu mẫu, tiêu đề..." /></div>
+                <div class="col-md-auto"><button class="btn btn-primary rounded-3"><i class="bi bi-search"></i> Tìm kiếm</button></div>
+            </form>
+            @if(TempData["Success"] != null){<div class="alert alert-success rounded-3">@TempData["Success"]</div>}
+            <div class="table-responsive"><table class="table align-middle table-hover">
+                <thead class="table-light"><tr><th>Ngày gửi</th><th>Sinh viên</th><th>Loại</th><th>Tiêu đề</th><th>Trạng thái</th><th class="text-end">Thao tác</th></tr></thead>
+                <tbody>
+                @foreach(var item in Model){
+                    <tr><td>@item.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td><td>@item.ResidentProfile?.FullName<br/><small class="text-muted">@item.ResidentProfile?.StudentCode</small></td><td>@item.FormType</td><td class="fw-semibold">@item.Title</td><td><span class="badge bg-warning text-dark rounded-pill px-3 py-2">@item.Status</span></td><td class="text-end"><a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary rounded-3">Xem xử lý</a></td></tr>
+                }
+                @if(!Model.Any()){<tr><td colspan="6" class="text-center text-muted py-5">Không có biểu mẫu phù hợp.</td></tr>}
+                </tbody>
+            </table></div>
+        </div>
+    </div>
+</div>

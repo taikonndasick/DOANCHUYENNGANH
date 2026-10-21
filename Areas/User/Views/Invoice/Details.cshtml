@@ -1,0 +1,348 @@
+@model QuanLyKTX.Models.Invoice
+@{
+    ViewData["Title"] = "Thanh toán hóa đơn";
+    Layout = "_UserLayout";
+    var transferSample = $"KTX{Model.Id:D5}";
+    var momoPhone = Model.ResidentProfile?.PhoneNumber ?? "";
+    var orderCode = string.IsNullOrWhiteSpace(Model.InvoiceCode) ? $"HD{Model.Id:D5}" : Model.InvoiceCode;
+}
+
+<style>
+    .gateway-page { max-width: 1180px; margin: 0 auto; }
+    .gateway-topbar { background: #fff; border: 1px solid #eceff3; border-radius: 8px; padding: 14px 20px; display: flex; align-items: center; gap: 12px; box-shadow: 0 10px 26px rgba(15, 23, 42, .05); }
+    .momo-mark { width: 44px; height: 44px; border-radius: 8px; background: #a50064; color: #fff; display: grid; place-items: center; font-weight: 900; line-height: .78; font-size: 15px; text-align: center; }
+    .checkout-shell { display: grid; grid-template-columns: 330px 1fr; gap: 28px; margin-top: 28px; align-items: start; }
+    .order-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; box-shadow: 0 12px 28px rgba(15, 23, 42, .06); }
+    .order-card h5 { font-weight: 800; margin: 0; }
+    .order-row { padding: 18px 22px; border-top: 1px solid #eef2f7; }
+    .order-label { color: #64748b; font-size: .85rem; margin-bottom: 6px; }
+    .order-value { color: #111827; font-weight: 800; overflow-wrap: anywhere; }
+    .amount-value { font-size: 2rem; color: #111827; font-weight: 800; }
+    .expire-card { margin-top: 16px; background: #fff0f7; color: #d61f7c; border-radius: 8px; padding: 18px; text-align: center; border: 1px solid #ffd4e8; }
+    .countdown-pill { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; width: 54px; height: 62px; border-radius: 10px; background: #f8c5df; margin: 8px 4px 0; font-weight: 800; }
+    .countdown-pill span:last-child { font-size: .75rem; font-weight: 600; }
+    .gateway-card { min-height: 574px; border-radius: 8px; box-shadow: 0 14px 35px rgba(15, 23, 42, .12); overflow: hidden; }
+    .method-tabs { display: flex; gap: 8px; padding: 12px; background: #fff; border: 1px solid #e5e7eb; border-bottom: 0; border-radius: 8px 8px 0 0; }
+    .method-tab { flex: 1; border: 1px solid #e5e7eb; background: #f8fafc; color: #475569; border-radius: 8px; min-height: 48px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+    .method-tab.active { background: #a50064; border-color: #a50064; color: #fff; }
+    .gateway-panel { display: none; min-height: 512px; padding: 26px; }
+    .gateway-panel.active { display: block; }
+    .momo-panel { background: linear-gradient(180deg, #e11b8d 0%, #c00075 100%); color: #fff; position: relative; overflow: hidden; }
+    .momo-panel::before, .momo-panel::after { content: ""; position: absolute; width: 220px; height: 220px; border-radius: 50%; border: 30px solid rgba(255,255,255,.08); }
+    .momo-panel::before { top: -90px; right: -60px; }
+    .momo-panel::after { left: -90px; bottom: -100px; }
+    .bank-panel { background: linear-gradient(180deg, #eef8ff 0%, #dff2ff 100%); color: #0f172a; }
+    .card-panel { background: linear-gradient(180deg, #f8fafc 0%, #edf2f7 100%); color: #0f172a; }
+    .promo-strip { width: min(360px, 100%); margin: 0 auto 20px; background: #fff; color: #a50064; border-radius: 8px; padding: 10px 14px; font-weight: 800; text-align: center; box-shadow: 0 8px 18px rgba(0,0,0,.12); }
+    .qr-card { width: min(300px, 100%); margin: 0 auto; padding: 16px; background: #fff; border-radius: 12px; color: #111827; text-align: center; box-shadow: 0 12px 28px rgba(0,0,0,.18); }
+    .qr-frame { position: relative; width: 214px; height: 214px; margin: 0 auto; background: #fff; border-radius: 6px; padding: 12px; }
+    .qr-fake { position: relative; width: 190px; height: 190px; margin: 0 auto; background-color: #fff; background-image: linear-gradient(90deg, #111 10px, transparent 10px), linear-gradient(#111 10px, transparent 10px), linear-gradient(45deg, transparent 42%, #111 43% 53%, transparent 54%), radial-gradient(circle at 70% 28%, #111 0 4px, transparent 5px), radial-gradient(circle at 42% 68%, #111 0 4px, transparent 5px); background-size: 24px 24px, 24px 24px, 18px 18px, 34px 34px, 30px 30px; }
+    .qr-eye { position: absolute; width: 48px; height: 48px; border: 8px solid #111; background: #fff; }
+    .qr-eye::after { content: ""; position: absolute; width: 16px; height: 16px; background: #111; top: 8px; left: 8px; }
+    .eye-tl { top: 12px; left: 12px; }
+    .eye-tr { top: 12px; right: 12px; }
+    .eye-bl { bottom: 12px; left: 12px; }
+    .qr-center { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 46px; height: 46px; border-radius: 50%; background: #a50064; color: #fff; display: grid; place-items: center; font-weight: 900; font-size: .7rem; border: 5px solid #fff; }
+    .scan-note { margin-top: 22px; font-weight: 800; text-align: center; }
+    .gateway-form { position: relative; z-index: 1; }
+    .gateway-input { border: 1px solid #e2e8f0; border-radius: 10px; min-height: 46px; }
+    .bank-box { background: #fff; border: 1px solid #cfe8f7; border-radius: 12px; padding: 18px; box-shadow: 0 10px 24px rgba(15, 76, 129, .08); }
+    .bank-brand { width: 54px; height: 54px; border-radius: 12px; background: #0f4c81; color: #fff; display: grid; place-items: center; font-weight: 900; }
+    .card-preview { border-radius: 18px; background: linear-gradient(135deg, #182848, #4b6cb7); color: #fff; padding: 22px; min-height: 190px; box-shadow: 0 18px 36px rgba(24, 40, 72, .28); }
+    .card-chip { width: 46px; height: 34px; border-radius: 8px; background: linear-gradient(135deg,#f9d976,#f39f36); }
+    .payment-submit { min-height: 48px; border: 0; border-radius: 8px; padding: 0 28px; font-weight: 900; }
+    .btn-momo { background: #fff; color: #a50064; }
+    .btn-bank { background: #0f4c81; color: #fff; }
+    .btn-card { background: #111827; color: #fff; }
+    .mock-badge { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 6px 12px; background: rgba(255,255,255,.18); color: #fff; font-size: .78rem; font-weight: 800; }
+    .bank-panel .mock-badge, .card-panel .mock-badge { background: #fff; color: #0f4c81; border: 1px solid #cfe8f7; }
+    @@media (max-width: 992px) { .checkout-shell { grid-template-columns: 1fr; } .gateway-panel { min-height: auto; } }
+    @@media print { .d-print-none { display: none !important; } .gateway-topbar, .gateway-card, .order-card { box-shadow: none !important; } }
+</style>
+
+<div class="gateway-page py-4">
+    <div class="gateway-topbar d-print-none">
+        <div class="momo-mark">mo<br />mo</div>
+        <div>
+            <div class="fw-bold">Cổng thanh toán mô phỏng KTX</div>
+            <div class="small text-muted">Giao diện demo phục vụ đồ án cơ sở, không kết nối giao dịch thật.</div>
+        </div>
+    </div>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger rounded-4 mt-3 d-print-none"><i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["Error"]</div>
+    }
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success rounded-4 mt-3 d-print-none"><i class="bi bi-check-circle-fill me-2"></i>@TempData["Success"]</div>
+    }
+
+    <div class="checkout-shell">
+        <aside>
+            <div class="order-card">
+                <div class="p-4">
+                    <h5>Thông tin đơn hàng</h5>
+                </div>
+                <div class="order-row">
+                    <div class="order-label">Nhà cung cấp</div>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="bank-brand">KTX</div>
+                        <div class="order-value">Ban quản lý KTX HUTECH</div>
+                    </div>
+                </div>
+                <div class="order-row">
+                    <div class="order-label">Mã đơn hàng</div>
+                    <div class="order-value">@orderCode</div>
+                </div>
+                <div class="order-row">
+                    <div class="order-label">Mô tả</div>
+                    <div class="order-value">@(string.IsNullOrWhiteSpace(Model.Description) ? "Thanh toán hóa đơn ký túc xá" : Model.Description)</div>
+                </div>
+                <div class="order-row">
+                    <div class="order-label">Sinh viên</div>
+                    <div class="order-value">@Model.ResidentProfile?.FullName</div>
+                    <div class="small text-muted">MSSV: @(Model.ResidentProfile?.StudentCode ?? "-")</div>
+                </div>
+                <div class="order-row">
+                    <div class="order-label">Số tiền</div>
+                    <div class="amount-value">@Model.TotalAmount.ToString("N0")đ</div>
+                </div>
+            </div>
+
+            @if (Model.Status != "Paid" && Model.Status != "Cancelled")
+            {
+                <div class="expire-card d-print-none">
+                    <div class="fw-semibold">Đơn hàng sẽ hết hạn sau:</div>
+                    <div>
+                        <span class="countdown-pill"><span id="countMinute">09</span><span>Phút</span></span>
+                        <span class="countdown-pill"><span id="countSecond">59</span><span>Giây</span></span>
+                    </div>
+                    <a asp-action="Index" class="d-inline-block mt-3 text-decoration-none fw-bold" style="color:#d61f7c">Quay về</a>
+                </div>
+            }
+        </aside>
+
+        <main>
+            <div class="method-tabs d-print-none">
+                <button type="button" class="method-tab active" data-method="Momo"><i class="bi bi-phone"></i>MoMo</button>
+                <button type="button" class="method-tab" data-method="BankTransfer"><i class="bi bi-bank"></i>Chuyển khoản</button>
+                <button type="button" class="method-tab" data-method="Card"><i class="bi bi-credit-card-2-front"></i>Thẻ ngân hàng</button>
+            </div>
+
+            <div class="gateway-card">
+                @if (Model.Status == "Paid")
+                {
+                    <div class="gateway-panel active card-panel text-center d-flex flex-column justify-content-center">
+                        <i class="bi bi-check-circle-fill text-success display-1 mb-3"></i>
+                        <h3 class="fw-bold">Hóa đơn đã thanh toán</h3>
+                        <p class="text-muted">Bạn có thể in biên lai hoặc quay về danh sách hóa đơn.</p>
+                        <div class="d-flex justify-content-center gap-2 flex-wrap d-print-none">
+                            <button onclick="window.print()" class="btn btn-outline-dark rounded-pill px-4"><i class="bi bi-printer me-2"></i>In biên lai</button>
+                            <a asp-action="Index" class="btn btn-primary rounded-pill px-4">Danh sách hóa đơn</a>
+                        </div>
+                    </div>
+                }
+                else if (Model.Status == "Cancelled")
+                {
+                    <div class="gateway-panel active card-panel text-center d-flex flex-column justify-content-center">
+                        <i class="bi bi-x-circle-fill text-secondary display-1 mb-3"></i>
+                        <h3 class="fw-bold">Hóa đơn đã hủy</h3>
+                        <a asp-action="Index" class="btn btn-primary rounded-pill px-4 d-print-none">Danh sách hóa đơn</a>
+                    </div>
+                }
+                else
+                {
+                    <form asp-action="ProcessPayment" method="post" id="paymentForm" class="gateway-form">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="invoiceId" value="@Model.Id" />
+                        <input type="hidden" name="paymentType" id="selectedPaymentType" value="Momo" />
+
+                        <section class="gateway-panel momo-panel active" data-panel="Momo">
+                            <div class="text-end mb-3"><span class="mock-badge"><i class="bi bi-info-circle"></i>Mô phỏng đồ án</span></div>
+                            <div class="promo-strip">Tích xu đổi quà cho mọi giao dịch</div>
+                            <div class="qr-card">
+                                <div class="d-flex justify-content-center mb-2">
+                                    <span class="badge rounded-pill text-bg-light border px-3 py-2">Ví Trả Sau <span style="color:#a50064">mo mo</span></span>
+                                </div>
+                                <div class="qr-frame">
+                                    <div class="qr-fake">
+                                        <span class="qr-eye eye-tl"></span>
+                                        <span class="qr-eye eye-tr"></span>
+                                        <span class="qr-eye eye-bl"></span>
+                                        <span class="qr-center">mo<br />mo</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="scan-note">
+                                <i class="bi bi-qr-code-scan me-2"></i>Sử dụng App MoMo hoặc camera hỗ trợ QR code để quét mã
+                            </div>
+
+                            <div class="row justify-content-center mt-4">
+                                <div class="col-md-7">
+                                    <label class="form-label fw-bold">Số điện thoại ví MoMo</label>
+                                    <input name="momoPhone" value="@momoPhone" class="form-control gateway-input text-center fw-bold" placeholder="VD: 0901234567" maxlength="10" data-required-for="Momo" required />
+                                </div>
+                            </div>
+
+                            <div class="text-center mt-4">
+                                <button type="submit" class="payment-submit btn-momo"><i class="bi bi-check2-circle me-2"></i>Xác nhận đã thanh toán MoMo</button>
+                            </div>
+                        </section>
+
+                        <section class="gateway-panel bank-panel" data-panel="BankTransfer">
+                            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                                <div>
+                                    <h4 class="fw-bold mb-1">Chuyển khoản ngân hàng</h4>
+                                    <div class="text-muted">Quét QR hoặc nhập mã giao dịch để mô phỏng ghi nhận thanh toán.</div>
+                                </div>
+                                <span class="mock-badge"><i class="bi bi-info-circle"></i>Mô phỏng đồ án</span>
+                            </div>
+
+                            <div class="row g-4 align-items-center">
+                                <div class="col-lg-5">
+                                    <div class="qr-card">
+                                        <div class="qr-frame">
+                                            <div class="qr-fake">
+                                                <span class="qr-eye eye-tl"></span>
+                                                <span class="qr-eye eye-tr"></span>
+                                                <span class="qr-eye eye-bl"></span>
+                                                <span class="qr-center" style="background:#0f4c81">KTX</span>
+                                            </div>
+                                        </div>
+                                        <div class="fw-bold mt-2">QR chuyển khoản</div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-7">
+                                    <div class="bank-box mb-3">
+                                        <div class="row g-3">
+                                            <div class="col-sm-6"><div class="text-muted small">Ngân hàng</div><div class="fw-bold">HUTECH BANK DEMO</div></div>
+                                            <div class="col-sm-6"><div class="text-muted small">Số tài khoản</div><div class="fw-bold">1020 2406 2026</div></div>
+                                            <div class="col-sm-6"><div class="text-muted small">Chủ tài khoản</div><div class="fw-bold">BAN QUAN LY KTX HUTECH</div></div>
+                                            <div class="col-sm-6"><div class="text-muted small">Số tiền</div><div class="fw-bold text-primary">@Model.TotalAmount.ToString("N0")đ</div></div>
+                                            <div class="col-12"><div class="text-muted small">Nội dung chuyển khoản</div><div class="fw-bold">@transferSample</div></div>
+                                        </div>
+                                    </div>
+                                    <label class="form-label fw-bold">Mã giao dịch / nội dung chuyển khoản</label>
+                                    <input name="bankTransferCode" value="@transferSample" class="form-control gateway-input fw-bold" data-required-for="BankTransfer" />
+                                    <button type="submit" class="payment-submit btn-bank mt-3"><i class="bi bi-check2-circle me-2"></i>Xác nhận chuyển khoản</button>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="gateway-panel card-panel" data-panel="Card">
+                            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                                <div>
+                                    <h4 class="fw-bold mb-1">Thanh toán bằng thẻ ngân hàng</h4>
+                                    <div class="text-muted">Nhập thông tin thẻ demo để hệ thống cập nhật trạng thái hóa đơn.</div>
+                                </div>
+                                <span class="mock-badge"><i class="bi bi-info-circle"></i>Mô phỏng đồ án</span>
+                            </div>
+
+                            <div class="row g-4 align-items-start">
+                                <div class="col-lg-5">
+                                    <div class="card-preview">
+                                        <div class="d-flex justify-content-between align-items-start mb-4">
+                                            <div class="card-chip"></div>
+                                            <i class="bi bi-wifi-2 fs-3"></i>
+                                        </div>
+                                        <div class="fs-5 fw-bold mb-4" id="cardPreviewNumber">**** **** **** 2026</div>
+                                        <div class="d-flex justify-content-between">
+                                            <div><div class="small opacity-75">Chủ thẻ</div><div class="fw-bold" id="cardPreviewName">NGUYEN VAN A</div></div>
+                                            <div><div class="small opacity-75">Hết hạn</div><div class="fw-bold" id="cardPreviewExpiry">12/28</div></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-7">
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <label class="form-label fw-bold">Tên chủ thẻ</label>
+                                            <input name="cardHolderName" id="cardHolderName" class="form-control gateway-input" placeholder="NGUYEN VAN A" data-required-for="Card" />
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label fw-bold">Số thẻ</label>
+                                            <input name="cardNumber" id="cardNumber" class="form-control gateway-input" placeholder="9704 0000 0000 2026" maxlength="19" data-required-for="Card" />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold">Ngày hết hạn</label>
+                                            <input name="cardExpiry" id="cardExpiry" class="form-control gateway-input" placeholder="MM/YY" maxlength="5" data-required-for="Card" />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold">Mã CVV</label>
+                                            <input name="cardCvv" class="form-control gateway-input" placeholder="123" maxlength="3" data-required-for="Card" />
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="payment-submit btn-card mt-3"><i class="bi bi-shield-check me-2"></i>Xác nhận thanh toán thẻ</button>
+                                </div>
+                            </div>
+                        </section>
+                    </form>
+                }
+            </div>
+
+            <div class="text-center mt-4 d-print-none">
+                <a asp-action="Index" class="text-decoration-none text-muted fw-bold small"><i class="bi bi-arrow-left me-2"></i>DANH SÁCH HÓA ĐƠN</a>
+            </div>
+        </main>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const selectedPaymentType = document.getElementById('selectedPaymentType');
+        const methodTabs = document.querySelectorAll('.method-tab');
+        const panels = document.querySelectorAll('.gateway-panel[data-panel]');
+
+        methodTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const method = tab.dataset.method;
+                selectedPaymentType.value = method;
+
+                methodTabs.forEach(item => item.classList.remove('active'));
+                panels.forEach(panel => panel.classList.remove('active'));
+                document.querySelectorAll('[data-required-for]').forEach(input => input.required = input.dataset.requiredFor === method);
+
+                tab.classList.add('active');
+                document.querySelector(`[data-panel="${method}"]`)?.classList.add('active');
+            });
+        });
+
+        let remain = 599;
+        const minuteEl = document.getElementById('countMinute');
+        const secondEl = document.getElementById('countSecond');
+        function tickCountdown() {
+            if (!minuteEl || !secondEl) return;
+            const minutes = Math.floor(remain / 60).toString().padStart(2, '0');
+            const seconds = (remain % 60).toString().padStart(2, '0');
+            minuteEl.textContent = minutes;
+            secondEl.textContent = seconds;
+            remain = Math.max(0, remain - 1);
+            setTimeout(tickCountdown, 1000);
+        }
+        tickCountdown();
+
+        const cardHolderName = document.getElementById('cardHolderName');
+        const cardNumber = document.getElementById('cardNumber');
+        const cardExpiry = document.getElementById('cardExpiry');
+        const previewName = document.getElementById('cardPreviewName');
+        const previewNumber = document.getElementById('cardPreviewNumber');
+        const previewExpiry = document.getElementById('cardPreviewExpiry');
+
+        cardHolderName?.addEventListener('input', () => {
+            previewName.textContent = cardHolderName.value.trim().toUpperCase() || 'NGUYEN VAN A';
+        });
+
+        cardNumber?.addEventListener('input', () => {
+            const digits = cardNumber.value.replace(/\D/g, '').slice(0, 16);
+            cardNumber.value = digits.replace(/(.{4})/g, '$1 ').trim();
+            previewNumber.textContent = cardNumber.value || '**** **** **** 2026';
+        });
+
+        cardExpiry?.addEventListener('input', () => {
+            const digits = cardExpiry.value.replace(/\D/g, '').slice(0, 4);
+            cardExpiry.value = digits.length > 2 ? `${digits.slice(0, 2)}/${digits.slice(2)}` : digits;
+            previewExpiry.textContent = cardExpiry.value || '12/28';
+        });
+    </script>
+}

@@ -1,0 +1,68 @@
+@model IEnumerable<QuanLyKTX.Models.StudentRequestForm>
+@{
+    ViewData["Title"] = "Biểu mẫu đã điền";
+    Layout = "_UserLayout";
+}
+
+<div class="card page-card p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <h3 class="page-title mb-1"><i class="bi bi-archive text-primary me-2"></i>Biểu mẫu đã điền</h3>
+            <p class="text-muted mb-0">Theo dõi các biểu mẫu đã gửi và trạng thái xử lý từ ban quản lý.</p>
+        </div>
+        <a asp-action="Templates" class="btn btn-primary rounded-pill">
+            <i class="bi bi-plus-circle me-1"></i> Gửi biểu mẫu mới
+        </a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success rounded-4">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-warning rounded-4">@TempData["Error"]</div>
+    }
+
+    <div class="table-responsive">
+        <table class="table align-middle table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>Ngày gửi</th>
+                    <th>Loại</th>
+                    <th>Tiêu đề</th>
+                    <th>Trạng thái</th>
+                    <th>File</th>
+                    <th>Ghi chú admin</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    var badge = item.Status == "Đã duyệt" ? "bg-success" : item.Status == "Từ chối" ? "bg-danger" : "bg-warning text-dark";
+                    <tr>
+                        <td>@item.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>@item.FormType</td>
+                        <td class="fw-semibold">@item.Title</td>
+                        <td><span class="badge @badge rounded-pill px-3 py-2">@item.Status</span></td>
+                        <td>
+                            @if (!string.IsNullOrWhiteSpace(item.AttachmentPath))
+                            {
+                                <a href="@item.AttachmentPath" target="_blank" class="btn btn-sm btn-outline-secondary rounded-pill">Xem file</a>
+                            }
+                            else
+                            {
+                                <span class="text-muted">-</span>
+                            }
+                        </td>
+                        <td>@(item.AdminNote ?? item.RejectReason ?? "-")</td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="6" class="empty-state">Chưa có biểu mẫu nào đã gửi.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

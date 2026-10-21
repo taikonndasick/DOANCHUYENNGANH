@@ -1,0 +1,55 @@
+@model QuanLyKTX.Models.FormTemplate
+@{
+    ViewData["Title"] = "Thêm biểu mẫu";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card border-0 shadow-sm rounded-4">
+    <div class="card-body p-4">
+        <h3 class="fw-bold mb-3"><i class="bi bi-plus-circle text-primary me-2"></i>Thêm biểu mẫu</h3>
+        <form asp-action="Create" method="post" enctype="multipart/form-data" class="row g-3">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="col-md-6">
+                <label asp-for="Name" class="form-label fw-semibold"></label>
+                <input asp-for="Name" class="form-control" placeholder="Ví dụ: Đơn xin miễn giảm phí" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="col-md-3">
+                <label asp-for="Type" class="form-label fw-semibold"></label>
+                <input asp-for="Type" class="form-control" placeholder="Miễn giảm phí" />
+                <span asp-validation-for="Type" class="text-danger"></span>
+            </div>
+            <div class="col-md-3">
+                <label asp-for="Icon" class="form-label fw-semibold"></label>
+                <input asp-for="Icon" class="form-control" placeholder="bi-journal-text" />
+            </div>
+            <div class="col-12">
+                <label asp-for="Description" class="form-label fw-semibold"></label>
+                <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">File mẫu nếu có</label>
+                <input type="file" name="templateFile" class="form-control" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" />
+                <small class="text-muted">Có thể để trống nếu dùng form nhập trực tuyến.</small>
+            </div>
+            <div class="col-md-3 d-flex align-items-center">
+                <div class="form-check mt-4">
+                    <input asp-for="IsActive" class="form-check-input" />
+                    <label asp-for="IsActive" class="form-check-label"></label>
+                </div>
+            </div>
+            <div class="col-md-3 d-flex align-items-center">
+                <div class="form-check mt-4">
+                    <input asp-for="IsTemporary" class="form-check-input" />
+                    <label asp-for="IsTemporary" class="form-check-label"></label>
+                </div>
+            </div>
+            <div class="col-12 d-flex gap-2">
+                <button class="btn btn-primary px-4"><i class="bi bi-save me-1"></i>Lưu</button>
+                <a asp-action="Index" class="btn btn-light border">Quay lại</a>
+            </div>
+        </form>
+    </div>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

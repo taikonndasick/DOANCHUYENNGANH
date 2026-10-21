@@ -1,0 +1,154 @@
+﻿@model QuanLyKTX.Models.Invoice
+
+@{
+    ViewData["Title"] = "Chi tiết hóa đơn #" + Model.InvoiceCode;
+}
+
+<div class="container py-4">
+    <div class="row">
+        @* Tiêu đề chính *@
+        <div class="col-12 mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="fw-bold text-dark">
+                        <i class="bi bi-file-earmark-medical-fill text-primary me-2"></i>Hồ sơ hóa đơn chi tiết
+                    </h3>
+                    <p class="text-muted">Xem thông tin thanh toán, cư dân và dịch vụ liên quan.</p>
+                </div>
+                <div>
+                    <span class="badge @(Model.Status == "Paid" ? "bg-success" : Model.Status == "Cancelled" ? "bg-secondary" : "bg-danger") px-4 py-2 rounded-pill fs-6 shadow-sm">
+                        <i class="bi @(Model.Status == "Paid" ? "bi-check-circle" : "bi-exclamation-triangle") me-1"></i>
+                        @Model.Status
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        @* CỘT TRÁI: Thông tin tài chính & Cư dân *@
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-header bg-white border-0 pt-4 ps-4">
+                    <h5 class="fw-bold mb-0">Nội dung thanh toán</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row mb-4">
+                        <div class="col-sm-6 mb-3 mb-sm-0">
+                            <label class="text-muted small fw-bold text-uppercase">Mã hóa đơn</label>
+                            <p class="fs-5 fw-bold text-dark mb-0">#@Model.InvoiceCode</p>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="text-muted small fw-bold text-uppercase">Số tiền thanh toán</label>
+                            <p class="fs-4 fw-bold text-primary mb-0">@Model.TotalAmount.ToString("N0") đ</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-sm-6 mb-3 mb-sm-0">
+                            <label class="text-muted small fw-bold text-uppercase">Cư dân thụ hưởng</label>
+                            <div class="d-flex align-items-center mt-1">
+                                <div class="bg-light p-2 rounded-circle me-3">
+                                    <i class="bi bi-person-fill text-secondary"></i>
+                                </div>
+                                <p class="fw-bold mb-0">@Model.ResidentProfile?.FullName</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="text-muted small fw-bold text-uppercase">Dịch vụ liên quan</label>
+                            <div class="d-flex align-items-center mt-1">
+                                <div class="bg-light p-2 rounded-circle me-3">
+                                    <i class="bi bi-box-seam-fill text-secondary"></i>
+                                </div>
+                                <p class="fw-bold mb-0">@(Model.ServiceBooking?.Service?.Name ?? "N/A")</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-light rounded-3">
+                        <i class="bi bi-link-45deg me-1"></i>
+                        <span class="small">Mã Booking: <strong>#@Model.ServiceBookingId</strong></span>
+                    </div>
+                </div>
+                <div class="card-footer bg-white border-0 pb-4 ps-4">
+                    <a asp-area="Admin" asp-controller="Invoice" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
+                        <i class="bi bi-arrow-left me-1"></i> Quay lại danh sách
+                    </a>
+                    @if (Model.Status != "Paid")
+                    {
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary rounded-pill px-4 ms-2">
+                            <i class="bi bi-pencil-square me-1"></i> Chỉnh sửa
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+
+        @* CỘT PHẢI: Thời gian & Lịch sử *@
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-4">
+                    <h6 class="fw-bold mb-4">Dấu mốc thời gian</h6>
+
+                    <div class="d-flex mb-4">
+                        <div class="text-primary me-3">
+                            <i class="bi bi-calendar-plus fs-4"></i>
+                        </div>
+                        <div>
+                            <label class="text-muted small d-block">Ngày khởi tạo</label>
+                            <span class="fw-bold">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex mb-4">
+                        <div class="text-danger me-3">
+                            <i class="bi bi-calendar-check fs-4"></i>
+                        </div>
+                        <div>
+                            <label class="text-muted small d-block">Hạn thanh toán</label>
+                            <span class="fw-bold">@(Model.DueDate?.ToString("dd/MM/yyyy") ?? "Không có hạn")</span>
+                        </div>
+                    </div>
+
+                    <hr class="opacity-25">
+
+                    @* Widget ghi chú nhanh cho Admin *@
+                    <div class="mt-4">
+                        <p class="small text-muted mb-0">
+                            <i class="bi bi-shield-lock-fill me-1"></i>
+                            Dữ liệu hóa đơn này đã được xác thực bởi hệ thống quản lý KTX HUTECH.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            @* Quick Action Alert *@
+            <div class="alert alert-info border-0 shadow-sm rounded-4 p-4">
+                <h6 class="fw-bold mb-2"><i class="bi bi-printer me-2"></i>Hành động nhanh</h6>
+                <small class="d-block mb-3">Bạn có thể xuất hóa đơn này ra định dạng PDF để gửi cho cư dân qua email.</small>
+                <button onclick="window.print()" class="btn btn-info btn-sm w-100 rounded-3 text-white fw-bold">
+                    <i class="bi bi-download me-1"></i> Tải PDF / In
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Ẩn bớt các thành phần khi in */
+    @@media print {
+        .btn, .card-footer, .alert, .card-header, .text-muted.small {
+            display: none !important;
+        }
+
+        .container {
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+
+        .card {
+            border: 1px solid #eee !important;
+            box-shadow: none !important;
+        }
+    }
+</style>

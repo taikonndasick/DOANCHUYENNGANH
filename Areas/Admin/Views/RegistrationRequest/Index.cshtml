@@ -1,0 +1,89 @@
+﻿@model IEnumerable<QuanLyKTX.Models.StudentRegistration>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var status = ViewBag.Status as string ?? "Chờ duyệt";
+}
+
+<div class="app-content-header">
+    <div class="container-fluid">
+        <div class="row align-items-center mb-3">
+            <div class="col-sm-7">
+                <h3><i class="bi bi-person-check-fill text-primary me-2"></i>Duyệt hồ sơ đăng ký sinh viên</h3>
+                <div class="text-muted">Kiểm tra hồ sơ, giấy tờ và kích hoạt tài khoản sinh viên sau khi duyệt.</div>
+            </div>
+            <div class="col-sm-5 text-sm-end mt-3 mt-sm-0">
+                <a asp-action="Index" asp-route-status="Chờ duyệt" class="btn @(status == "Chờ duyệt" ? "btn-primary" : "btn-outline-primary") btn-sm">Chờ duyệt</a>
+                <a asp-action="Index" asp-route-status="Đã duyệt" class="btn @(status == "Đã duyệt" ? "btn-success" : "btn-outline-success") btn-sm">Đã duyệt</a>
+                <a asp-action="Index" asp-route-status="Từ chối" class="btn @(status == "Từ chối" ? "btn-danger" : "btn-outline-danger") btn-sm">Từ chối</a>
+                <a asp-action="Index" asp-route-status="Tất cả" class="btn @(status == "Tất cả" ? "btn-secondary" : "btn-outline-secondary") btn-sm">Tất cả</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success"><i class="bi bi-check-circle me-1"></i>@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger"><i class="bi bi-exclamation-triangle me-1"></i>@TempData["ErrorMessage"]</div>
+}
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Mã SV</th>
+                        <th>Họ tên</th>
+                        <th>Email</th>
+                        <th>Ngân hàng</th>
+                        <th>Giấy tờ</th>
+                        <th>Ngày gửi</th>
+                        <th>Trạng thái</th>
+                        <th class="text-end">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="9" class="text-center text-muted py-4">Không có hồ sơ nào.</td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in Model)
+                    {
+                        var badge = item.Status == "Đã duyệt" ? "bg-success" : item.Status == "Từ chối" ? "bg-danger" : "bg-warning text-dark";
+                        <tr>
+                            <td>#@item.Id</td>
+                            <td><span class="badge bg-info text-dark">@item.StudentCode</span></td>
+                            <td>
+                                <div class="fw-semibold">@item.FullName</div>
+                                <div class="small text-muted">@item.Username</div>
+                            </td>
+                            <td>@item.Email</td>
+                            <td>
+                                <div>@item.BankName</div>
+                                <div class="small text-muted">@item.BankAccountNumber</div>
+                            </td>
+                            <td><span class="badge bg-light text-dark border">@(item.Documents?.Count ?? 0) file</span></td>
+                            <td>@item.SubmittedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td><span class="badge @badge">@item.Status</span></td>
+                            <td class="text-end">
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i> Xem
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

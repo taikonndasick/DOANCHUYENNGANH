@@ -1,0 +1,56 @@
+@model QuanLyKTX.Models.Service
+@{
+    ViewData["Title"] = "Xác nhận đăng ký dịch vụ";
+    Layout = "_UserLayout";
+}
+
+<div class="container py-5">
+    <div class="card border-0 shadow-lg rounded-4 mx-auto" style="max-width: 680px;">
+        <div class="card-body p-5">
+            <div class="text-center mb-4">
+                <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-primary-subtle text-primary mb-3" style="width:70px;height:70px;">
+                    <i class="bi bi-journal-check fs-2"></i>
+                </div>
+                <h3 class="fw-bold">Xác nhận đăng ký dịch vụ</h3>
+                <p class="text-muted mb-0">Vui lòng kiểm tra thông tin trước khi gửi yêu cầu</p>
+            </div>
+
+            <div class="p-4 bg-light rounded-4 mb-4 border">
+                <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+                    <div>
+                        <span class="text-uppercase text-muted small fw-bold d-block mb-1">Dịch vụ lựa chọn</span>
+                        <h5 class="text-primary fw-bold mb-2">@Model.Name</h5>
+                        <p class="text-muted small mb-0">@Model.Description</p>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge @(Model.Type == "Request" ? "bg-warning-subtle text-warning" : "bg-primary-subtle text-primary") rounded-pill px-3 mb-2">
+                            @(Model.Type == "Request" ? "Yêu cầu xử lý" : "Dịch vụ đăng ký")
+                        </span>
+                        <div class="fw-bold fs-5 text-dark">@(Model.Price <= 0 ? "Miễn phí / theo thực tế" : Model.Price.ToString("N0") + " đ")</div>
+                    </div>
+                </div>
+            </div>
+
+            <form asp-action="ConfirmRegister" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="serviceId" value="@Model.Id" />
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Ghi chú / nội dung yêu cầu</label>
+                    <textarea name="note" class="form-control rounded-3" rows="4"
+                              placeholder="VD: thời gian mong muốn sử dụng, tình trạng thiết bị cần sửa, số lượng, ghi chú thêm..."></textarea>
+                    <small class="text-muted">Nếu dịch vụ có phí, hệ thống sẽ tạo hóa đơn để bạn thanh toán trước khi admin duyệt.</small>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary py-3 fw-bold rounded-pill shadow-sm">
+                        <i class="bi bi-send-check me-1"></i> Gửi đăng ký dịch vụ
+                    </button>
+                    <a asp-action="Index" class="btn btn-link text-muted text-decoration-none">
+                        <i class="bi bi-arrow-left me-1"></i> Quay lại danh sách dịch vụ
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

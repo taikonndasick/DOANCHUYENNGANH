@@ -1,0 +1,94 @@
+﻿@model QuanLyKTX.Models.Vehicle
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+@{
+    ViewData["Title"] = "Cập nhật thông tin xe";
+}
+
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12 mb-4">
+            <h3 class="fw-bold text-dark">
+                <i class="bi bi-pencil-square text-warning me-2"></i>Cập nhật phương tiện
+            </h3>
+            <p class="text-muted">Chỉnh sửa thông tin biển số hoặc chủ sở hữu phương tiện.</p>
+        </div>
+    </div>
+
+    <form method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
+
+        <div class="row">
+            @* Bên trái: Thông tin chính *@
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-header bg-white border-0 pt-4 ps-4">
+                        <h5 class="fw-bold mb-0">Thông tin xe</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label asp-for="LicensePlate" class="form-label fw-bold">Biển kiểm soát</label>
+                                <input asp-for="LicensePlate" class="form-control form-control-lg shadow-none border-2"
+                                       placeholder="VD: 59A-123.45" />
+                                <span asp-validation-for="LicensePlate" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="VehicleType" class="form-label fw-bold">Loại xe</label>
+                                <select asp-for="VehicleType" class="form-select form-select-lg shadow-none border-2">
+                                    <option value="Xe máy">Xe máy</option>
+                                    <option value="Ô tô">Ô tô</option>
+                                    <option value="Xe đạp điện">Xe đạp điện</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-0">
+                            <label asp-for="ResidentProfileId" class="form-label fw-bold">Chủ sở hữu (Cư dân)</label>
+                            <select asp-for="ResidentProfileId" class="form-select form-select-lg shadow-none border-2"
+                                    asp-items="@(ViewBag.Residents as SelectList)">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* Bên phải: Trạng thái & Thao tác *@
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold mb-3 text-muted small text-uppercase">Trạng thái hoạt động</h6>
+                        <div class="mb-4">
+                            <select asp-for="Status" class="form-select shadow-none bg-light border-0 fw-bold text-primary">
+                                <option value="Active">🟢 Đang hoạt động</option>
+                                <option value="Inactive">🔴 Ngừng sử dụng</option>
+                                <option value="Pending">🕒 Chờ xác minh</option>
+                            </select>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-3 fw-bold py-3 shadow">
+                                <i class="bi bi-save me-1"></i> LƯU THAY ĐỔI
+                            </button>
+                            <a asp-action="Index" class="btn btn-link text-secondary text-decoration-none small mt-2">
+                                <i class="bi bi-x-circle me-1"></i> Hủy và quay lại
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-info border-0 rounded-4 shadow-sm p-4">
+                    <h6 class="fw-bold"><i class="bi bi-info-circle me-2"></i>Ghi chú</h6>
+                    <small>Việc thay đổi biển số xe sẽ ảnh hưởng đến dữ liệu ra vào cổng tại trạm an ninh.</small>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

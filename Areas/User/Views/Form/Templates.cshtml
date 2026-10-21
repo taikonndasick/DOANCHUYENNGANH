@@ -1,0 +1,83 @@
+@model IEnumerable<QuanLyKTX.Models.FormTemplate>
+@{
+    ViewData["Title"] = "Danh sách biểu mẫu";
+    Layout = "_UserLayout";
+    var keyword = ViewBag.Keyword as string ?? "";
+    var selectedType = ViewBag.Type as string ?? "Tất cả";
+    var types = ViewBag.Types as IEnumerable<string> ?? new[] { "Tất cả" };
+}
+
+<div class="card page-card p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <h3 class="page-title mb-1"><i class="bi bi-journal-text text-primary me-2"></i>Danh sách biểu mẫu</h3>
+            <p class="text-muted mb-0">Chọn mẫu phù hợp để điền trực tiếp trên hệ thống hoặc đính kèm file minh chứng nếu cần.</p>
+        </div>
+        <a asp-action="Submitted" class="btn btn-outline-primary rounded-pill">
+            <i class="bi bi-clock-history me-1"></i> Biểu mẫu đã điền
+        </a>
+    </div>
+
+    <form method="get" class="row g-2 align-items-end mb-4">
+        <div class="col-md-5">
+            <label class="form-label small fw-bold text-muted">Tìm kiếm biểu mẫu</label>
+            <input name="keyword" value="@keyword" class="form-control rounded-pill" placeholder="Nhập tên biểu mẫu, loại biểu mẫu..." />
+        </div>
+        <div class="col-md-4">
+            <label class="form-label small fw-bold text-muted">Loại biểu mẫu</label>
+            <select name="type" class="form-select rounded-pill">
+                @foreach (var item in types)
+                {
+                    <option value="@item" selected="@(item == selectedType)">@item</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3 d-flex gap-2">
+            <button class="btn btn-primary rounded-pill flex-fill"><i class="bi bi-search me-1"></i>Tìm</button>
+            <a asp-action="Templates" class="btn btn-light rounded-pill px-3">Xóa lọc</a>
+        </div>
+    </form>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-light border rounded-4 mb-0 text-center py-5">
+            <i class="bi bi-inbox fs-1 text-muted d-block mb-2"></i>
+            Chưa có biểu mẫu phù hợp.
+        </div>
+    }
+    else
+    {
+        <div class="row g-3">
+            @foreach (var item in Model)
+            {
+                <div class="col-md-6 col-xl-4">
+                    <div class="border rounded-4 p-4 h-100 bg-white shadow-sm d-flex flex-column">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style="width:48px;height:48px;min-width:48px">
+                                <i class="bi @(string.IsNullOrWhiteSpace(item.Icon) ? "bi-journal-text" : item.Icon) fs-4"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold mb-1">@item.Name</h5>
+                                <span class="badge bg-light text-dark border rounded-pill">@item.Type</span>
+                            </div>
+                        </div>
+                        <p class="text-muted small mb-4 flex-grow-1">@item.Description</p>
+
+                        <div class="d-grid gap-2">
+                            <a asp-action="Create" asp-route-templateId="@item.Id" asp-route-type="@item.Type" class="btn btn-primary rounded-pill">
+                                <i class="bi bi-pencil-square me-1"></i> Điền online
+                            </a>
+
+                            @if (!string.IsNullOrWhiteSpace(item.TemplateFilePath))
+                            {
+                                <a href="@item.TemplateFilePath" target="_blank" class="btn btn-outline-secondary rounded-pill">
+                                    <i class="bi bi-download me-1"></i> Tải file mẫu
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

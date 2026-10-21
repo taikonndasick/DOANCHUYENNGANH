@@ -1,0 +1,113 @@
+﻿@model QuanLyKTX.Models.Notification
+
+@{
+    ViewData["Title"] = "Soạn thông báo mới";
+}
+
+<div class="container py-4">
+    <div class="row">
+        @* Tiêu đề trang *@
+        <div class="col-12 mb-4">
+            <h3 class="fw-bold text-dark">
+                <i class="bi bi-megaphone-fill text-primary me-2"></i>Soạn tin thông báo
+            </h3>
+            <p class="text-muted">Gửi tin tức, nội quy hoặc các văn bản PDF quan trọng đến ứng dụng của cư dân.</p>
+        </div>
+    </div>
+
+    <form asp-action="Create" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <div class="row">
+            @* PHẦN CHÍNH: Bên trái (Nội dung văn bản) *@
+            <div class="col-lg-8 mb-4">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-header bg-white border-0 pt-4 ps-4">
+                        <h5 class="fw-bold mb-0">Nội dung chi tiết</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="mb-4">
+                            <label asp-for="Title" class="form-label fw-bold">
+                                <i class="bi bi-type me-1"></i> Tiêu đề thông báo
+                            </label>
+                            <input asp-for="Title" class="form-control form-control-lg shadow-none border-2 bg-light"
+                                   placeholder="VD: Thông báo bảo trì điện định kỳ..." />
+                            <span asp-validation-for="Title" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-0">
+                            <label asp-for="Content" class="form-label fw-bold">
+                                <i class="bi bi-chat-left-text me-1"></i> Nội dung tóm tắt
+                            </label>
+                            <textarea asp-for="Content" class="form-control shadow-none border-2 bg-light"
+                                      rows="10" placeholder="Viết nội dung thông báo tại đây..."></textarea>
+                            <span asp-validation-for="Content" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* PHẦN PHỤ: Bên phải (Đính kèm & Thao tác) *@
+            <div class="col-lg-4">
+                @* Khối tải lên tệp *@
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold mb-3 text-muted small text-uppercase">Tệp đính kèm</h6>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold"><i class="bi bi-image me-1"></i> HÌNH ẢNH MINH HỌA</label>
+                            <input type="file" name="imageFile" class="form-control shadow-none border-2" accept="image/*" />
+                            <small class="text-muted" style="font-size: 0.7rem;">Định dạng: JPG, PNG, WebP</small>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label small fw-bold"><i class="bi bi-file-earmark-pdf me-1"></i> TÀI LIỆU PDF</label>
+                            <input type="file" name="pdfFile" class="form-control shadow-none border-2" accept=".pdf" />
+                            <small class="text-muted" style="font-size: 0.7rem;">Văn bản thông báo có mộc đỏ (nếu có)</small>
+                        </div>
+
+                        <hr class="text-muted opacity-25">
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-3 fw-bold py-3 shadow">
+                                <i class="bi bi-send-fill me-1"></i> GỬI THÔNG BÁO
+                            </button>
+                            <a asp-action="Index" class="btn btn-link text-secondary text-decoration-none small mt-2">
+                                <i class="bi bi-arrow-left me-1"></i> Quay lại danh sách
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                @* Widget hướng dẫn cư dân *@
+                <div class="alert alert-info border-0 rounded-4 shadow-sm p-4">
+                    <h6 class="fw-bold"><i class="bi bi-lightbulb me-2"></i>Mẹo nhỏ</h6>
+                    <small class="d-block mb-2">Các thông báo có <strong>hình ảnh</strong> và <strong>PDF</strong> đính kèm thường được cư dân quan tâm và đọc kỹ hơn.</small>
+                    <small class="d-block">Hệ thống sẽ gửi thông báo đẩy (Push Notification) đến tất cả cư dân ngay khi bạn bấm Gửi.</small>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+<style>
+    /* Đồng bộ màu sắc đặc trưng Sapphire */
+    .btn-primary {
+        background-color: #0f4c81;
+        border-color: #0f4c81;
+    }
+
+        .btn-primary:hover {
+            background-color: #0d3e6a;
+            border-color: #0d3e6a;
+        }
+
+    .bg-light {
+        background-color: #f8fafc !important;
+    }
+</style>

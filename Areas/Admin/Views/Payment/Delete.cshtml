@@ -1,0 +1,25 @@
+﻿@model QuanLyKTX.Models.Payment
+
+@{
+    ViewData["Title"] = "Xóa thanh toán";
+}
+
+<div class="alert alert-danger rounded-4 shadow-sm">
+    <h4 class="fw-bold"><i class="bi bi-exclamation-triangle-fill me-2"></i>Xác nhận xóa!</h4>
+    <p>Bạn có chắc chắn muốn xóa giao dịch <strong>@Model.TransferCode</strong> của hóa đơn <strong>@Model.Invoice?.InvoiceCode</strong>?</p>
+    <p class="mb-0">Hành động này không thể hoàn tác và có thể ảnh hưởng đến báo cáo tài chính.</p>
+</div>
+
+<div class="card mt-3">
+    <div class="card-body">
+        <p><strong>Số tiền:</strong> @Model.Amount.ToString("N0") VNĐ</p>
+        <p><strong>Ngày thực hiện:</strong> @Model.PaidAt</p>
+    </div>
+    <div class="card-footer">
+        <form asp-action="Delete">
+            <input type="hidden" asp-for="Id" />
+            <button type="submit" class="btn btn-danger">Xóa vĩnh viễn</button>
+            <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+        </form>
+    </div>
+</div>

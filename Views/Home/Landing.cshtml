@@ -1,0 +1,472 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KTX HUTECH - Hệ thống quản lý cư trú sinh viên</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Source+Sans+3:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="~/landing/templatemo-parallax-starter.css">
+
+        <style>
+                .hero-action-box {
+                    margin-top: 38px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: stretch;
+                    gap: 24px;
+                    flex-wrap: wrap;
+                }
+
+                .hero-card-link {
+                    width: 380px;
+                    min-height: 126px;
+                    padding: 22px 24px;
+                    display: flex;
+                    align-items: center;
+                    gap: 18px;
+                    text-decoration: none;
+                    border-radius: 18px;
+                    border: 1px solid rgba(255, 255, 255, 0.35);
+                    color: #fff;
+                    transition: all 0.25s ease;
+                    box-shadow: 0 14px 38px rgba(0, 0, 0, 0.32);
+                    backdrop-filter: blur(10px);
+                }
+
+                .hero-card-register {
+                    background: linear-gradient(135deg, rgba(0, 123, 255, 0.86), rgba(0, 180, 216, 0.72));
+                }
+
+                .hero-card-login {
+                    background: rgba(255, 255, 255, 0.13);
+                }
+
+                .hero-card-link:hover {
+                    transform: translateY(-6px);
+                    color: #fff;
+                    border-color: rgba(255, 255, 255, 0.8);
+                    box-shadow: 0 22px 52px rgba(0, 0, 0, 0.42);
+                }
+
+                .hero-card-icon {
+                    width: 58px;
+                    height: 58px;
+                    min-width: 58px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background: rgba(255, 255, 255, 0.18);
+                    font-size: 27px;
+                }
+
+                .hero-card-link h3 {
+                    margin: 0 0 8px;
+                    font-size: 17px;
+                    font-weight: 800;
+                    letter-spacing: 0.8px;
+                    text-transform: uppercase;
+                    font-family: 'Oswald', sans-serif;
+                }
+
+                .hero-card-link p {
+                    margin: 0;
+                    font-size: 13.5px;
+                    line-height: 1.5;
+                    color: rgba(255, 255, 255, 0.88);
+                    font-family: 'Source Sans 3', sans-serif;
+                }
+
+                .info-highlight {
+                    margin-top: 24px;
+                    display: grid;
+                    grid-template-columns: repeat(3, minmax(0, 1fr));
+                    gap: 18px;
+                }
+
+                .info-card {
+                    padding: 22px 20px;
+                    border: 1px solid rgba(255, 255, 255, 0.22);
+                    background: rgba(0, 0, 0, 0.28);
+                    backdrop-filter: blur(6px);
+                    text-align: left;
+                }
+
+                    .info-card h3 {
+                        margin: 0 0 12px;
+                        font-family: 'Oswald', sans-serif;
+                        letter-spacing: 1px;
+                        color: #fff;
+                    }
+
+                    .info-card p {
+                        margin: 0;
+                        color: rgba(255, 255, 255, 0.82);
+                        line-height: 1.55;
+                    }
+
+                .process-list {
+                    margin-top: 32px;
+                    display: grid;
+                    grid-template-columns: repeat(4, minmax(0, 1fr));
+                    gap: 18px;
+                }
+
+                .process-step {
+                    padding: 20px 18px;
+                    border: 1px solid rgba(255, 255, 255, 0.22);
+                    background: rgba(255, 255, 255, 0.08);
+                    backdrop-filter: blur(8px);
+                    text-align: center;
+                }
+
+                .process-number {
+                    width: 44px;
+                    height: 44px;
+                    margin: 0 auto 14px;
+                    border-radius: 50%;
+                    background: rgba(0, 123, 255, 0.75);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-family: 'Oswald', sans-serif;
+                    font-size: 20px;
+                    color: #fff;
+                }
+
+                .process-step h3 {
+                    margin: 0 0 10px;
+                    color: #fff;
+                    font-family: 'Oswald', sans-serif;
+                    letter-spacing: 1px;
+                    font-size: 18px;
+                }
+
+                .process-step p {
+                    margin: 0;
+                    color: rgba(255, 255, 255, 0.78);
+                    line-height: 1.5;
+                    font-size: 14px;
+                }
+
+                .contact-note-box {
+                    margin-top: 28px;
+                    display: grid;
+                    grid-template-columns: repeat(3, minmax(0, 1fr));
+                    gap: 18px;
+                }
+
+                .contact-note {
+                    padding: 20px;
+                    border: 1px solid rgba(255, 255, 255, 0.22);
+                    background: rgba(0, 0, 0, 0.28);
+                    text-align: center;
+                }
+
+                    .contact-note strong {
+                        display: block;
+                        margin-bottom: 8px;
+                        color: #fff;
+                        font-family: 'Oswald', sans-serif;
+                        letter-spacing: 1px;
+                    }
+
+                    .contact-note span {
+                        color: rgba(255, 255, 255, 0.82);
+                    }
+
+                @@media (max-width: 992px) {
+                    .info-highlight,
+                    .process-list,
+                    .contact-note-box {
+                        grid-template-columns: repeat(2, minmax(0, 1fr));
+                    }
+                }
+
+                @@media (max-width: 768px) {
+                    .hero-action-box {
+                        gap: 16px;
+                    }
+
+                    .hero-card-link {
+                        width: 92%;
+                    }
+
+                    .info-highlight,
+                    .process-list,
+                    .contact-note-box {
+                        grid-template-columns: 1fr;
+                    }
+                }
+        </style>
+    </head>
+    <body>
+
+        <nav id="templatemo-nav">
+            <div class="nav-container">
+                <a href="#home" class="nav-logo">KTX HUTECH</a>
+
+                <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+
+                <ul class="nav-links" id="navLinks">
+                    <li><a href="#home" class="active">TRANG CHỦ</a></li>
+                    <li><a href="#about">GIỚI THIỆU</a></li>
+                    <li><a href="#services">CHỨC NĂNG</a></li>
+                    <li><a href="#gallery">QUY TRÌNH</a></li>
+                    <li><a href="#contact">LIÊN HỆ</a></li>
+                    <li>
+                        <a class="login-btn" href="@Url.Action("Login", "Auth")">LOGIN</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <section id="home" class="parallax-section">
+            <div class="parallax-bg" data-speed="0.5"
+                 style="background-image: url('@Url.Content("~/landing/images/parallax-bg-01.jpg")')"></div>
+            <div class="parallax-overlay"></div>
+            <div class="section-content">
+                <h1 class="section-title hero-title">CHÀO MỪNG ĐẾN VỚI<br>KTX HUTECH</h1>
+                <p class="section-subtitle caps">NỀN TẢNG QUẢN LÝ CƯ TRÚ SINH VIÊN TRONG KÝ TÚC XÁ</p>
+
+                <div class="hero-action-box">
+                    <a href="@Url.Action("Index", "Register")" class="hero-card-link hero-card-register">
+                        <div class="hero-card-icon">📝</div>
+                        <div>
+                            <h3>Đăng ký dành cho sinh viên chưa ở KTX</h3>
+                            <p>Xem thông tin hồ sơ, chi phí và gửi đăng ký cư trú trực tuyến.</p>
+                        </div>
+                    </a>
+
+                    <a href="@Url.Action("Login", "Auth")" class="hero-card-link hero-card-login">
+                        <div class="hero-card-icon">🔐</div>
+                        <div>
+                            <h3>Sinh viên đang ở KTX</h3>
+                            <p>Đăng nhập để xem thông tin lưu trú, hóa đơn, thông báo và biểu mẫu.</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="parallax-section">
+            <div class="parallax-bg" data-speed="0.45"
+                 style="background-image: url('@Url.Content("~/landing/images/parallax-bg-02.jpg")')"></div>
+            <div class="parallax-overlay"></div>
+            <div class="section-content">
+                <h2 class="section-title">GIỚI THIỆU HỆ THỐNG</h2>
+
+                <div class="about-cols">
+                    <div class="about-col">
+                        <div class="about-thumb thumb-top-left">
+                            <img src="~/landing/images/about-01.jpg" alt="Quản lý ký túc xá">
+                            </div>
+
+                            <p>
+                                KTX HUTECH là website hỗ trợ quản lý cư trú sinh viên trong ký túc xá. Hệ thống giúp ban quản lý
+                                tiếp nhận hồ sơ đăng ký, quản lý thông tin sinh viên, theo dõi phòng ở, hợp đồng lưu trú,
+                                hóa đơn, thanh toán và các yêu cầu phát sinh trong quá trình sinh viên sinh sống tại ký túc xá.
+                            </p>
+
+                            <p>
+                                Thay vì xử lý thủ công bằng giấy tờ hoặc bảng tính rời rạc, hệ thống tập trung dữ liệu trên một nền tảng
+                                thống nhất, giúp giảm sai sót, dễ tra cứu thông tin và hỗ trợ admin xử lý hồ sơ đăng ký nhanh chóng hơn.
+                            </p>
+                        </div>
+
+                        <div class="about-col">
+                            <div class="about-thumb-wide">
+                                <img src="~/landing/images/about-02.jpg" alt="Hỗ trợ sinh viên">
+                                </div>
+
+                                <p>
+                                    Sinh viên chưa ở ký túc xá có thể xem thông tin phòng ở, chi phí, giấy tờ cần chuẩn bị và gửi hồ sơ
+                                    đăng ký cư trú trực tuyến. Hồ sơ sau khi gửi sẽ ở trạng thái chờ duyệt, tài khoản sinh viên chỉ được
+                                    kích hoạt sau khi admin kiểm tra và duyệt hợp lệ.
+                                </p>
+
+                                <p>
+                                    Sinh viên đang ở ký túc xá có thể đăng nhập để xem thông tin lưu trú, hợp đồng, lịch sử ở phòng,
+                                    hóa đơn, thông báo từ ban quản lý và gửi các biểu mẫu như đăng ký phòng, trả phòng, sửa chữa
+                                    hoặc các yêu cầu hỗ trợ khác.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="services" class="parallax-section">
+                    <div class="parallax-bg" data-speed="0.55"
+                         style="background-image: url('@Url.Content("~/landing/images/parallax-bg-03.jpg")')"></div>
+                    <div class="parallax-overlay overlay-dark"></div>
+                    <div class="section-content">
+                        <h2 class="section-title">CHỨC NĂNG NỔI BẬT</h2>
+                        <p class="section-subtitle caps">ĐĂNG KÝ - XÉT DUYỆT - LƯU TRÚ - THANH TOÁN</p>
+
+                        <div class="services-grid">
+                            <div class="service-item">
+                                <div class="service-icon">
+                                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                                        <rect x="4" y="5" width="32" height="30" rx="2" stroke="white" stroke-width="1.5" />
+                                        <line x1="10" y1="14" x2="30" y2="14" stroke="white" stroke-width="1.5" />
+                                        <line x1="10" y1="21" x2="30" y2="21" stroke="white" stroke-width="1.5" />
+                                        <line x1="10" y1="28" x2="22" y2="28" stroke="white" stroke-width="1.5" />
+                                    </svg>
+                                </div>
+                                <h3>ĐĂNG KÝ CƯ TRÚ</h3>
+                                <p class="caps">TIẾP NHẬN HỒ SƠ SINH VIÊN, GIẤY TỜ MINH CHỨNG VÀ TRẠNG THÁI CHỜ DUYỆT</p>
+                            </div>
+
+                            <div class="service-item">
+                                <div class="service-icon">
+                                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                                        <path d="M20 4L34 12V30L20 36L6 30V12L20 4Z" stroke="white" stroke-width="1.5" />
+                                        <path d="M14 20L18 24L27 15" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </div>
+                                <h3>XÉT DUYỆT HỒ SƠ</h3>
+                                <p class="caps">ADMIN KIỂM TRA THÔNG TIN, DUYỆT HỒ SƠ, KÍCH HOẠT TÀI KHOẢN VÀ TẠO HỒ SƠ SINH VIÊN</p>
+                            </div>
+
+                            <div class="service-item">
+                                <div class="service-icon">
+                                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                                        <rect x="7" y="6" width="26" height="30" rx="2" stroke="white" stroke-width="1.5" />
+                                        <path d="M13 13H27" stroke="white" stroke-width="1.5" />
+                                        <path d="M13 20H27" stroke="white" stroke-width="1.5" />
+                                        <path d="M13 27H21" stroke="white" stroke-width="1.5" />
+                                    </svg>
+                                </div>
+                                <h3>HỢP ĐỒNG & HÓA ĐƠN</h3>
+                                <p class="caps">QUẢN LÝ HỢP ĐỒNG LƯU TRÚ, HÓA ĐƠN TIỀN PHÒNG, DỊCH VỤ VÀ TÌNH TRẠNG THANH TOÁN</p>
+                            </div>
+                        </div>
+
+                        <div class="info-highlight">
+                            <div class="info-card">
+                                <h3>Hồ sơ cần chuẩn bị</h3>
+                                <p>Căn cước công dân/căn cước, thẻ bảo hiểm y tế, hình ảnh minh chứng trúng tuyển, nhập học hoặc thẻ sinh viên.</p>
+                            </div>
+                            <div class="info-card">
+                                <h3>Thông tin tài chính</h3>
+                                <p>Sinh viên cung cấp số tài khoản ngân hàng và tên ngân hàng để phục vụ đối soát, hoàn phí hoặc xử lý thanh toán khi cần.</p>
+                            </div>
+                            <div class="info-card">
+                                <h3>Biểu mẫu phát sinh</h3>
+                                <p>Các trường hợp miễn giảm chi phí, sửa chữa, trả phòng hoặc yêu cầu hỗ trợ sẽ được gửi sau tại mục biểu mẫu.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="gallery" class="parallax-section">
+                    <div class="parallax-bg" data-speed="0.5"
+                         style="background-image: url('@Url.Content("~/landing/images/parallax-bg-04.jpg")')"></div>
+                    <div class="parallax-overlay"></div>
+                    <div class="section-content">
+                        <h2 class="section-title">QUY TRÌNH ĐĂNG KÝ KTX</h2>
+                        <p class="section-subtitle caps">SINH VIÊN GỬI HỒ SƠ - ADMIN XÉT DUYỆT - HỆ THỐNG KÍCH HOẠT TÀI KHOẢN</p>
+
+                        <div class="process-list">
+                            <div class="process-step">
+                                <div class="process-number">1</div>
+                                <h3>Chuẩn bị hồ sơ</h3>
+                                <p>Sinh viên xem thông tin phòng, chi phí, giấy tờ bắt buộc và chuẩn bị dữ liệu đăng ký.</p>
+                            </div>
+                            <div class="process-step">
+                                <div class="process-number">2</div>
+                                <h3>Gửi đăng ký</h3>
+                                <p>Sinh viên nhập thông tin cá nhân, tài khoản, ngân hàng và tải lên giấy tờ cần thiết.</p>
+                            </div>
+                            <div class="process-step">
+                                <div class="process-number">3</div>
+                                <h3>Chờ xét duyệt</h3>
+                                <p>Admin kiểm tra thông tin khai báo, giấy tờ minh chứng và tính hợp lệ của hồ sơ.</p>
+                            </div>
+                            <div class="process-step">
+                                <div class="process-number">4</div>
+                                <h3>Kích hoạt tài khoản</h3>
+                                <p>Khi hồ sơ hợp lệ, hệ thống kích hoạt tài khoản để sinh viên đăng nhập và tiếp tục đăng ký phòng.</p>
+                            </div>
+                        </div>
+
+                        <div class="content-block">
+                            <p>
+                                Việc gửi hồ sơ đăng ký không đồng nghĩa với việc sinh viên đã được nhận phòng. Sinh viên chỉ được xem là
+                                cư trú chính thức sau khi hồ sơ được duyệt, yêu cầu đăng ký phòng được chấp nhận và hệ thống tạo hợp đồng lưu trú.
+                                Quy trình này giúp đảm bảo thông tin sinh viên, phòng ở, hợp đồng và hóa đơn được liên kết chặt chẽ.
+                            </p>
+
+                            <div class="stats-row">
+                                <div class="stat-item">
+                                    <span class="stat-number">2</span>
+                                    <span class="stat-label caps">NHÓM NGƯỜI DÙNG CHÍNH</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-number">4</span>
+                                    <span class="stat-label caps">BƯỚC ĐĂNG KÝ CƠ BẢN</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-number">3</span>
+                                    <span class="stat-label caps">GIẤY TỜ BẮT BUỘC</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="contact" class="parallax-section">
+                    <div class="parallax-bg" data-speed="0.5"
+                         style="background-image: url('@Url.Content("~/landing/images/parallax-bg-05.jpg")')"></div>
+                    <div class="parallax-overlay overlay-medium"></div>
+                    <div class="section-content">
+                        <h2 class="section-title">LIÊN HỆ BAN QUẢN LÝ KTX</h2>
+                        <p class="section-subtitle caps">HỖ TRỢ ĐĂNG KÝ - XÉT DUYỆT HỒ SƠ - GIẢI ĐÁP THÔNG TIN LƯU TRÚ</p>
+
+                        <div class="contact-note-box">
+                            <div class="contact-note">
+                                <strong>Thời gian hỗ trợ</strong>
+                                <span>Thứ 2 - Thứ 6, giờ hành chính</span>
+                            </div>
+                            <div class="contact-note">
+                                <strong>Email</strong>
+                                <span>ktx.hutech@example.com</span>
+                            </div>
+                            <div class="contact-note">
+                                <strong>Hotline</strong>
+                                <span>0123 456 789</span>
+                            </div>
+                        </div>
+
+                        <div class="contact-form-wrap">
+                            <form id="contactForm" class="contact-form">
+                                <div class="form-row">
+                                    <input type="text" placeholder="Họ và tên" required>
+                                    <input type="email" placeholder="Email liên hệ" required>
+                                </div>
+                                <textarea placeholder="Nội dung cần hỗ trợ" rows="5" required></textarea>
+                                <button type="submit" class="btn-submit">GỬI LIÊN HỆ</button>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+                <footer id="templatemo-footer">
+                    <p>Copyright &copy; 2026 KTX HUTECH - Hệ thống quản lý cư trú sinh viên trong ký túc xá</p>
+                </footer>
+
+                <script src="~/landing/templatemo-parallax-script.js"></script>
+            </body>
+        </html>

@@ -1,0 +1,49 @@
+﻿@model QuanLyKTX.Models.Invoice
+
+@{
+    ViewData["Title"] = "Xóa hóa đơn";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-body p-5 text-center">
+                    <div class="mb-4">
+                        <i class="bi bi-exclamation-octagon text-danger display-1"></i>
+                    </div>
+                    <h3 class="fw-bold text-dark">Xác nhận xóa hóa đơn?</h3>
+                    <p class="text-muted">Hành động này không thể hoàn tác. Mọi dữ liệu liên quan đến hóa đơn <strong>#@Model.InvoiceCode</strong> sẽ bị loại bỏ khỏi hệ thống.</p>
+
+                    <div class="p-4 bg-light rounded-4 my-4 text-start">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted small fw-bold">CƯ DÂN:</span>
+                            <span class="fw-bold">@Model.ResidentProfile?.FullName</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted small fw-bold">TỔNG TIỀN:</span>
+                            <span class="text-danger fw-bold">@Model.TotalAmount.ToString("N0") đ</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted small fw-bold">NGÀY TẠO:</span>
+                            <span>@Model.CreatedAt.ToString("dd/MM/yyyy")</span>
+                        </div>
+                    </div>
+
+                    <form asp-action="Delete">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="Id" />
+                        <div class="d-grid gap-3">
+                            <button type="submit" class="btn btn-danger btn-lg rounded-pill fw-bold py-3 shadow-sm">
+                                <i class="bi bi-trash3 me-2"></i>XÁC NHẬN XÓA VĨNH VIỄN
+                            </button>
+                            <a asp-action="Index" class="btn btn-link text-secondary text-decoration-none fw-bold">
+                                Không, quay lại danh sách
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

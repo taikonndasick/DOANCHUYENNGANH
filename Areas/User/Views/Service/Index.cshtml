@@ -1,0 +1,210 @@
+@model IEnumerable<QuanLyKTX.Models.Service>
+@{
+    ViewData["Title"] = "Dịch vụ KTX";
+    Layout = "_UserLayout";
+    var myServices = ViewBag.MyServices as List<QuanLyKTX.Models.ServiceBooking> ?? new List<QuanLyKTX.Models.ServiceBooking>();
+    string keyword = ViewBag.Keyword as string ?? "";
+    string type = ViewBag.Type as string ?? "Tất cả";
+    var monthlyServices = Model.Where(x => x.Type == "Monthly").ToList();
+    var optionalServices = Model.Where(x => x.Type != "Monthly").ToList();
+}
+
+<style>
+    .service-card {
+        border: 1px solid #e5e7eb;
+        border-radius: 20px;
+        background: #fff;
+        transition: .2s ease;
+        height: 100%;
+    }
+    .service-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 16px 35px rgba(15, 76, 129, .12);
+        border-color: #0d6efd;
+    }
+    .service-icon {
+        width: 54px;
+        height: 54px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #eef6ff;
+        color: #0d6efd;
+        font-size: 24px;
+    }
+</style>
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold mb-1"><i class="bi bi-tools text-primary me-2"></i>Dịch vụ KTX</h2>
+            <p class="text-muted mb-0">Đăng ký các dịch vụ phát sinh trong quá trình lưu trú. Tiền phòng không nằm trong mục này.</p>
+        </div>
+        <a asp-area="User" asp-controller="Service" asp-action="History" class="btn btn-outline-primary rounded-pill px-4">
+            <i class="bi bi-clock-history me-1"></i>Lịch sử đăng ký
+        </a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success rounded-4">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger rounded-4">@TempData["Error"]</div>
+    }
+
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-2 align-items-end">
+                <div class="col-lg-6">
+                    <label class="form-label small fw-bold text-muted">Tìm kiếm</label>
+                    <input name="keyword" value="@keyword" class="form-control" placeholder="Tên dịch vụ, mô tả..." />
+                </div>
+                <div class="col-lg-3">
+                    <label class="form-label small fw-bold text-muted">Loại dịch vụ</label>
+                    <select name="type" class="form-select">
+                        <option value="Tất cả" selected="@(type == "Tất cả")">Tất cả</option>
+                        <option value="Monthly" selected="@(type == "Monthly")">Tính vào hóa đơn tháng</option>
+                        <option value="Optional" selected="@(type == "Optional")">Sinh viên đăng ký</option>
+                        <option value="Request" selected="@(type == "Request")">Yêu cầu xử lý</option>
+                    </select>
+                </div>
+                <div class="col-lg-3 d-flex gap-2">
+                    <button class="btn btn-primary flex-fill" type="submit"><i class="bi bi-search"></i> Lọc</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary"><i class="bi bi-arrow-clockwise"></i></a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (myServices.Any())
+    {
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-header bg-white border-0 pt-4 px-4">
+                <h5 class="fw-bold mb-0"><i class="bi bi-patch-check text-success me-2"></i>Dịch vụ/yêu cầu của bạn</h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Dịch vụ</th>
+                                <th>Ngày gửi</th>
+                                <th>Trạng thái</th>
+                                <th>Ghi chú</th>
+                                <th class="text-end">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in myServices.Take(8))
+                            {
+                                <tr>
+                                    <td class="fw-bold">@item.Service?.Name</td>
+                                    <td>@item.BookingDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>
+                                        @switch (item.Status)
+                                        {
+                                            case "PendingPayment":
+                                                <span class="badge bg-warning-subtle text-warning rounded-pill px-3">Chờ thanh toán</span>
+                                                break;
+                                            case "Pending":
+                                                <span class="badge bg-warning-subtle text-warning rounded-pill px-3">Chờ xử lý</span>
+                                                break;
+                                            case "Approved":
+                                            case "Active":
+                                                <span class="badge bg-success-subtle text-success rounded-pill px-3">Đã duyệt</span>
+                                                break;
+                                            case "Rejected":
+                                                <span class="badge bg-danger-subtle text-danger rounded-pill px-3">Từ chối</span>
+                                                break;
+                                            default:
+                                                <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3">@item.Status</span>
+                                                break;
+                                        }
+                                    </td>
+                                    <td class="text-muted small">@item.Note</td>
+                                    <td class="text-end">
+                                        @if (item.Status == "Pending" || item.Status == "PendingPayment")
+                                        {
+                                            <form asp-action="CancelService" method="post" class="d-inline">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="bookingId" value="@item.Id" />
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Hủy yêu cầu dịch vụ này?')">Hủy</button>
+                                            </form>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (monthlyServices.Any())
+    {
+        <h5 class="fw-bold mb-3"><i class="bi bi-receipt text-info me-2"></i>Dịch vụ tính vào hóa đơn tháng</h5>
+        <div class="row g-4 mb-5">
+            @foreach (var service in monthlyServices)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="service-card p-4">
+                        <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                            <div class="service-icon"><i class="bi bi-calendar2-check"></i></div>
+                            <span class="badge bg-info-subtle text-info rounded-pill px-3">Hóa đơn tháng</span>
+                        </div>
+                        <h5 class="fw-bold">@service.Name</h5>
+                        <p class="text-muted small" style="min-height:42px;">@service.Description</p>
+                        <div class="fw-bold text-primary fs-5">@service.Price.ToString("N0") đ</div>
+                        <small class="text-muted">Ban quản lý lập vào hóa đơn định kỳ, sinh viên không cần đăng ký riêng.</small>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <h5 class="fw-bold mb-3"><i class="bi bi-plus-circle text-primary me-2"></i>Dịch vụ có thể đăng ký / yêu cầu</h5>
+    <div class="row g-4">
+        @if (!optionalServices.Any())
+        {
+            <div class="col-12 text-center text-muted py-5">Không có dịch vụ phù hợp.</div>
+        }
+        else
+        {
+            @foreach (var service in optionalServices)
+            {
+                var isSubscribed = myServices.Any(ms => ms.ServiceId == service.Id && ms.Status != "Cancelled" && ms.Status != "Rejected");
+                <div class="col-md-6 col-lg-4">
+                    <div class="service-card p-4">
+                        <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                            <div class="service-icon">
+                                <i class="@(service.Type == "Request" ? "bi bi-wrench-adjustable" : "bi bi-box-seam")"></i>
+                            </div>
+                            <span class="badge @(service.Type == "Request" ? "bg-warning-subtle text-warning" : "bg-primary-subtle text-primary") rounded-pill px-3">
+                                @(service.Type == "Request" ? "Yêu cầu xử lý" : "Đăng ký")
+                            </span>
+                        </div>
+                        <h5 class="fw-bold">@service.Name</h5>
+                        <p class="text-muted small" style="min-height:42px;">@service.Description</p>
+                        <div class="fw-bold text-primary fs-5 mb-3">
+                            @(service.Price <= 0 ? "Miễn phí / theo thực tế" : service.Price.ToString("N0") + " đ")
+                        </div>
+                        @if (isSubscribed)
+                        {
+                            <button class="btn btn-secondary w-100 rounded-pill" disabled>Đã gửi yêu cầu</button>
+                        }
+                        else
+                        {
+                            <a asp-area="User" asp-controller="Service" asp-action="Register" asp-route-id="@service.Id" class="btn btn-primary w-100 rounded-pill">
+                                @(service.Type == "Request" ? "Gửi yêu cầu" : "Đăng ký ngay")
+                            </a>
+                        }
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>

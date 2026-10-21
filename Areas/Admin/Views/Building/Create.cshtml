@@ -1,0 +1,139 @@
+﻿@model QuanLyKTX.Models.Building
+
+@{
+    ViewData["Title"] = "Thêm tòa nhà KTX";
+}
+
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12 mb-4">
+            <h3 class="fw-bold text-dark">
+                <i class="bi bi-building-add text-primary me-2"></i>Thêm tòa nhà KTX
+            </h3>
+            <p class="text-muted">Khởi tạo thông tin tòa nhà phục vụ quản lý phòng ở trong ký túc xá.</p>
+        </div>
+    </div>
+
+    <form asp-area="Admin" asp-controller="Building" asp-action="Create" method="post">
+        @Html.AntiForgeryToken()
+
+        <div class="row">
+            <div class="col-lg-8 mb-4">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-header bg-white border-0 pt-4 ps-4">
+                        <h5 class="fw-bold mb-0">Thông tin tòa nhà</h5>
+                    </div>
+
+                    <div class="card-body p-4">
+                        <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <label asp-for="Code" class="form-label fw-bold">
+                                    <i class="bi bi-hash me-1"></i> Mã tòa nhà
+                                </label>
+                                <input asp-for="Code" class="form-control form-control-lg shadow-none border-2 bg-light"
+                                       placeholder="VD: A, B, C" />
+                                <span asp-validation-for="Code" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-8 mt-3 mt-md-0">
+                                <label asp-for="Name" class="form-label fw-bold">
+                                    <i class="bi bi-building me-1"></i> Tên tòa nhà
+                                </label>
+                                <input asp-for="Name" class="form-control form-control-lg shadow-none border-2"
+                                       placeholder="VD: Tòa A - Ký túc xá HUTECH" />
+                                <span asp-validation-for="Name" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Address" class="form-label fw-bold">
+                                <i class="bi bi-geo-alt me-1"></i> Địa chỉ
+                            </label>
+                            <input asp-for="Address" class="form-control form-control-lg shadow-none border-2"
+                                   placeholder="Nhập địa chỉ hoặc khu vực của tòa nhà" />
+                            <span asp-validation-for="Address" class="text-danger small"></span>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <label asp-for="TotalFloors" class="form-label fw-bold">
+                                    <i class="bi bi-layers me-1"></i> Số tầng
+                                </label>
+                                <input asp-for="TotalFloors" type="number" min="1"
+                                       class="form-control form-control-lg shadow-none border-2"
+                                       placeholder="VD: 5" />
+                                <span asp-validation-for="TotalFloors" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-8 mt-3 mt-md-0">
+                                <label asp-for="Status" class="form-label fw-bold">
+                                    <i class="bi bi-toggle-on me-1"></i> Trạng thái
+                                </label>
+                                <select asp-for="Status" class="form-select form-select-lg shadow-none border-2">
+                                    <option value="Đang hoạt động">Đang hoạt động</option>
+                                    <option value="Bảo trì">Bảo trì</option>
+                                    <option value="Ngừng sử dụng">Ngừng sử dụng</option>
+                                </select>
+                                <span asp-validation-for="Status" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-0">
+                            <label asp-for="Description" class="form-label fw-bold">
+                                <i class="bi bi-card-text me-1"></i> Mô tả
+                            </label>
+                            <textarea asp-for="Description" rows="4"
+                                      class="form-control shadow-none border-2"
+                                      placeholder="Nhập mô tả ngắn về tòa nhà, khu vực, tiện ích hoặc ghi chú quản lý..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold mb-3 text-muted small text-uppercase">Thao tác</h6>
+
+                        <div class="alert alert-info border-0 rounded-3 small mb-4">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Sau khi tạo tòa nhà, bạn có thể tạo các phòng KTX thuộc tòa nhà này.
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-3 fw-bold py-3 shadow">
+                                <i class="bi bi-save me-1"></i> LƯU TÒA NHÀ
+                            </button>
+
+                            <a asp-area="Admin" asp-controller="Building" asp-action="Index"
+                                   class="btn btn-link text-secondary text-decoration-none small mt-2">
+                                <i class="bi bi-arrow-left me-1"></i> Hủy và quay lại
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-primary border-0 rounded-4 shadow-sm p-4">
+                    <h6 class="fw-bold">
+                        <i class="bi bi-lightbulb me-2"></i>Gợi ý nhập liệu
+                    </h6>
+                    <small class="d-block mb-2">Nên đặt mã tòa nhà ngắn gọn để dễ quản lý:</small>
+                    <ul class="small ps-3 mb-0">
+                        <li>Mã tòa: A, B, C hoặc KTX-A</li>
+                        <li>Tên tòa: Tòa A, Tòa B</li>
+                        <li>Trạng thái mặc định: Đang hoạt động</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

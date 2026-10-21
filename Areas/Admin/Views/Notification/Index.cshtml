@@ -1,0 +1,151 @@
+﻿@model IEnumerable<QuanLyKTX.Models.Notification>
+
+@{
+    ViewData["Title"] = "Quản lý thông báo";
+}
+
+<style>
+    .table-custom thead th {
+        background-color: #f8f9fa;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        font-weight: 700;
+        color: #475569;
+        border-top: none;
+    }
+
+    .btn-action {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        transition: all 0.2s;
+    }
+
+    .notification-img {
+        width: 60px;
+        height: 40px;
+        object-fit: cover;
+        border-radius: 6px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .pdf-badge {
+        font-size: 0.7rem;
+        padding: 0.4em 0.6em;
+        border-radius: 4px;
+        font-weight: 700;
+    }
+
+    /* Hiệu ứng khi hover dòng */
+    .table-hover tbody tr:hover {
+        background-color: rgba(15, 76, 129, 0.02);
+    }
+</style>
+
+<div class="card border-0 shadow-sm rounded-4">
+    <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold mb-0 text-dark">
+            <i class="bi bi-megaphone me-2 text-primary"></i>Danh sách thông báo
+        </h5>
+        <a asp-action="Create" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm ms-auto">
+            <i class="bi bi-plus-lg me-1"></i>Đăng thông báo mới
+        </a>
+    </div>
+
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-custom align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th class="ps-4" style="width: 5%">ID</th>
+                        <th style="width: 10%">Ảnh</th>
+                        <th style="width: 35%">Nội dung thông báo</th>
+                        <th style="width: 15%">Ngày đăng</th>
+                        <th style="width: 10%">Trạng thái</th>
+                        <th style="width: 10%">Đính kèm</th>
+                        <th class="text-center pe-4" style="width: 15%">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="ps-4 text-muted fw-bold">#@item.Id</td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(item.ImagePath))
+                                {
+                                    <img src="@item.ImagePath" class="notification-img shadow-sm" />
+                                }
+                                else
+                                {
+                                    <div class="notification-img bg-light d-flex align-items-center justify-content-center text-muted border border-dashed">
+                                        <i class="bi bi-image" style="font-size: 0.8rem;"></i>
+                                    </div>
+                                }
+                            </td>
+                            <td>
+                                <div class="fw-bold text-dark text-truncate" style="max-width: 300px;">@item.Title</div>
+                                <div class="text-muted text-truncate" style="max-width: 300px; font-size: 0.85rem;" title="@item.Content">
+                                    @item.Content
+                                </div>
+                            </td>
+                            <td>
+                                <div class="small fw-medium text-dark">@item.CreatedAt.ToString("dd/MM/yyyy")</div>
+                                <div class="small text-muted" style="font-size: 0.75rem;">@item.CreatedAt.ToString("HH:mm")</div>
+                            </td>
+                            <td>
+                                @if (item.IsActive)
+                                {
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2" style="font-size: 0.7rem;">
+                                        <i class="bi bi-check-circle me-1"></i>Hiển thị
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill px-2" style="font-size: 0.7rem;">
+                                        <i class="bi bi-eye-slash me-1"></i>Ẩn
+                                    </span>
+                                }
+                            </td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(item.PdfPath))
+                                {
+                                    <span class="badge bg-danger-subtle text-danger pdf-badge text-uppercase border border-danger-subtle">
+                                        <i class="bi bi-file-earmark-pdf-fill me-1"></i>PDF
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">---</span>
+                                }
+                            </td>
+                            <td class="text-center pe-4">
+                                <div class="d-flex justify-content-center gap-2">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-action btn-outline-info" title="Xem chi tiết">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-action btn-outline-warning" title="Sửa">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    @* Liên kết dẫn tới trang xác nhận xóa *@
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-action btn-outline-danger" title="Xóa">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer bg-white border-0 py-3 d-flex justify-content-between">
+        <small class="text-muted italic">Hiển thị thông tin thông báo nội bộ KTX HUTECH</small>
+        <small class="fw-bold text-primary">Tổng số: @Model.Count() bản tin</small>
+    </div>
+</div>

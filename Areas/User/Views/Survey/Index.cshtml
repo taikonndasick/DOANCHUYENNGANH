@@ -1,0 +1,11 @@
+@model IEnumerable<QuanLyKTX.Models.SurveyResponse>
+@{ ViewData["Title"] = "Khảo sát"; Layout = "_UserLayout"; }
+<div class="card page-card p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2"><div><h3 class="page-title mb-1"><i class="bi bi-clipboard-data text-primary me-2"></i>Khảo sát</h3><p class="text-muted mb-0">Gửi ý kiến đánh giá chất lượng ký túc xá.</p></div><a asp-action="Create" class="btn btn-primary rounded-pill"><i class="bi bi-plus-circle"></i> Gửi khảo sát</a></div>
+    @if (TempData["Success"] != null) { <div class="alert alert-success rounded-4">@TempData["Success"]</div> }
+    @if (TempData["Error"] != null) { <div class="alert alert-warning rounded-4">@TempData["Error"]</div> }
+    <div class="table-responsive"><table class="table align-middle table-hover"><thead class="table-light"><tr><th>Ngày gửi</th><th>Nội dung khảo sát</th><th>Mức hài lòng</th><th>Góp ý</th></tr></thead><tbody>
+    @foreach(var item in Model){<tr><td>@item.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td><td class="fw-semibold">@item.SurveyTitle</td><td><span class="badge bg-primary rounded-pill px-3 py-2">@item.SatisfactionLevel/5</span></td><td>@item.Feedback</td></tr>}
+    @if(!Model.Any()){<tr><td colspan="4" class="empty-state">Chưa có khảo sát nào.</td></tr>}
+    </tbody></table></div>
+</div>

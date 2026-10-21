@@ -1,0 +1,72 @@
+@model QuanLyKTX.Models.Invoice
+@{
+    ViewData["Title"] = "Phiên thanh toán";
+    Layout = "_UserLayout";
+    var method = ViewBag.PaymentMethod as string ?? "Chuyển khoản";
+    var remaining = 300;
+    if (ViewBag.RemainingSeconds is int r)
+    {
+        remaining = Math.Clamp(r, 0, 300);
+    }
+}
+
+<div class="card page-card p-4 mx-auto text-center" style="max-width:760px">
+    <div class="mb-3">
+        <i class="bi bi-shield-lock-fill text-primary" style="font-size:4rem"></i>
+    </div>
+    <h3 class="page-title">Phiên thanh toán đang mở</h3>
+    <p class="text-muted">Hình thức: <strong>@method</strong>. Vui lòng xác nhận trong vòng <strong>5 phút</strong>.</p>
+
+    <div class="display-4 fw-bold text-danger my-3" id="countdown">--:--</div>
+
+    <div class="border rounded-4 p-3 bg-light mb-4">
+        <div>Mã hóa đơn: <strong>@(string.IsNullOrWhiteSpace(Model.InvoiceCode) ? $"HD{Model.Id:D5}" : Model.InvoiceCode)</strong></div>
+        <div>Số tiền: <strong class="text-primary">@Model.TotalAmount.ToString("N0") đ</strong></div>
+        <div>Nội dung chuyển khoản: <strong>KTX@Model.Id.ToString("D5")</strong></div>
+    </div>
+
+    @if (remaining <= 0)
+    {
+        <div class="alert alert-danger rounded-4">Phiên thanh toán đã hết hạn. Vui lòng tạo lại phiên mới.</div>
+        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-primary rounded-pill">Tạo lại phiên</a>
+    }
+    else
+    {
+        <form asp-action="ConfirmPayment" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="invoiceId" value="@Model.Id" />
+            <button id="confirmBtn" class="btn btn-success btn-lg rounded-pill px-5">
+                <i class="bi bi-check2-circle"></i> Xác nhận đã thanh toán
+            </button>
+        </form>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        let remain = Math.max(0, Math.min(300, Number(@remaining)));
+        const el = document.getElementById('countdown');
+        const btn = document.getElementById('confirmBtn');
+
+        function tick() {
+            if (remain <= 0) {
+                el.textContent = 'Hết hạn';
+                if (btn) {
+                    btn.disabled = true;
+                    btn.textContent = 'Phiên thanh toán đã hết hạn';
+                    btn.classList.remove('btn-success');
+                    btn.classList.add('btn-secondary');
+                }
+                return;
+            }
+
+            const m = Math.floor(remain / 60).toString().padStart(2, '0');
+            const s = (remain % 60).toString().padStart(2, '0');
+            el.textContent = `${m}:${s}`;
+            remain--;
+            setTimeout(tick, 1000);
+        }
+
+        tick();
+    </script>
+}

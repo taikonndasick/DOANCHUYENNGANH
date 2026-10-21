@@ -1,0 +1,95 @@
+﻿@model QuanLyKTX.Models.Invoice
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+@{
+    ViewData["Title"] = "Cập nhật hóa đơn #" + Model.InvoiceCode;
+}
+
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12 mb-4">
+            <h3 class="fw-bold text-dark">
+                <i class="bi bi-pencil-square text-warning me-2"></i>Chỉnh sửa hóa đơn
+            </h3>
+            <p class="text-muted">Cập nhật thông tin tài chính hoặc thay đổi trạng thái thanh toán của hóa đơn.</p>
+        </div>
+    </div>
+
+    <form method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="CreatedAt" /> @* Giữ nguyên ngày tạo gốc *@
+
+        <div class="row">
+            @* PHẦN CHÍNH: Bên trái *@
+            <div class="col-lg-8 mb-4">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-header bg-white border-0 pt-4 ps-4">
+                        <h5 class="fw-bold mb-0">Thông tin cập nhật</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label asp-for="InvoiceCode" class="form-label fw-bold">Mã hóa đơn</label>
+                                <input asp-for="InvoiceCode" class="form-control form-control-lg shadow-none border-2 bg-light" readonly />
+                                <small class="text-muted italic">Mã hóa đơn không được phép thay đổi.</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="TotalAmount" class="form-label fw-bold">Tổng tiền (VNĐ)</label>
+                                <input asp-for="TotalAmount" type="number" class="form-control form-control-lg shadow-none border-2 fw-bold text-primary" />
+                                <span asp-validation-for="TotalAmount" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="ResidentProfileId" class="form-label fw-bold">Cư dân thụ hưởng</label>
+                            <select asp-for="ResidentProfileId" class="form-select form-select-lg shadow-none border-2"
+                                    asp-items="@(ViewBag.Residents as SelectList)"></select>
+                        </div>
+
+                        <div class="mb-0">
+                            <label asp-for="ServiceBookingId" class="form-label fw-bold">Booking liên kết</label>
+                            <select asp-for="ServiceBookingId" class="form-select form-select-lg shadow-none border-2"
+                                    asp-items="@(ViewBag.Bookings as SelectList)">
+                                <option value="">-- Không có liên kết dịch vụ --</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* PHẦN PHỤ: Bên phải *@
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold mb-3">Thời hạn & Trạng thái</h6>
+
+                        <div class="mb-3">
+                            <label asp-for="DueDate" class="form-label small text-muted fw-bold">HẠN THANH TOÁN MỚI</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-calendar-event"></i></span>
+                                <input asp-for="DueDate" type="date" class="form-control shadow-none border-start-0 bg-light" />
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Status" class="form-label small text-muted fw-bold">CẬP NHẬT TRẠNG THÁI</label>
+                            <select asp-for="Status" class="form-select shadow-none bg-light border-0 fw-bold">
+                                <option value="Unpaid">🔴 Unpaid</option>
+                                <option value="Paid">🟢 Paid</option>
+                                <option value="Cancelled">⚪ Cancelled</option>
+                            </select>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-3 fw-bold py-3 shadow">
+                                <i class="bi bi-save me-1"></i> LƯU THAY ĐỔI
+                            </button>
+                            <a asp-action="Index" class="btn btn-link text-secondary text-decoration-none small">Hủy bỏ</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

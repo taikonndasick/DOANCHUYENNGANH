@@ -1,0 +1,113 @@
+@model List<QuanLyKTX.Models.ResidentCard>
+@{
+    ViewData["Title"] = "Danh sách thẻ KTX";
+    var keyword = ViewBag.Keyword as string ?? "";
+    var status = ViewBag.Status as string ?? "Tất cả";
+    var expiredState = ViewBag.ExpiredState as string ?? "Tất cả";
+    var currentPage = (int)(ViewBag.CurrentPage ?? 1);
+    var totalPages = (int)(ViewBag.TotalPages ?? 1);
+    var pageSize = (int)(ViewBag.PageSize ?? 50);
+    var totalCount = (int)(ViewBag.TotalCount ?? Model.Count);
+}
+
+<style>
+    .table-custom thead th { background-color: #f8f9fa; text-transform: uppercase; font-size: .75rem; letter-spacing: .5px; font-weight: 700; color: #475569; border-top: none; }
+    .btn-action { width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; }
+    .badge-card { padding: .5em .8em; font-weight: 600; border-radius: 6px; font-size: .8rem; }
+    .card-code { font-family: Monaco, Consolas, monospace; background: #f8fafc; border: 1px solid #e2e8f0; padding: 4px 8px; border-radius: 6px; color: #0f172a; font-weight: 600; }
+</style>
+
+<div class="card border-0 shadow-sm rounded-4">
+    <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+        <div>
+            <h5 class="fw-bold mb-1 text-dark"><i class="bi bi-credit-card-2-front me-2 text-primary"></i>Danh sách thẻ KTX</h5>
+            <small class="text-muted">Tìm theo mã thẻ, tên sinh viên, MSSV hoặc trạng thái.</small>
+        </div>
+        <a asp-area="Admin" asp-controller="ResidentCard" asp-action="Create" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm"><i class="bi bi-plus-lg me-1"></i>Tạo thẻ mới</a>
+    </div>
+
+    <div class="card-body border-top">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label small text-muted">Từ khóa</label>
+                <input name="keyword" value="@keyword" class="form-control rounded-3" placeholder="Mã thẻ, họ tên, MSSV, SĐT..." />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small text-muted">Trạng thái</label>
+                <select name="status" class="form-select rounded-3">
+                    <option value="Tất cả" selected="@(status == "Tất cả")">Tất cả</option>
+                    <option value="Active" selected="@(status == "Active")">Đang hoạt động</option>
+                    <option value="Locked" selected="@(status == "Locked")">Đã khóa</option>
+                    <option value="Expired" selected="@(status == "Expired")">Hết hạn</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small text-muted">Thời hạn</label>
+                <select name="expiredState" class="form-select rounded-3">
+                    <option value="Tất cả" selected="@(expiredState == "Tất cả")">Tất cả</option>
+                    <option value="Còn hạn" selected="@(expiredState == "Còn hạn")">Còn hạn</option>
+                    <option value="Hết hạn" selected="@(expiredState == "Hết hạn")">Hết hạn</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small text-muted">Số dòng</label>
+                <select name="pageSize" class="form-select rounded-3">
+                    <option value="50" selected="@(pageSize == 50)">50</option>
+                    <option value="100" selected="@(pageSize == 100)">100</option>
+                    <option value="200" selected="@(pageSize == 200)">200</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex gap-2">
+                <button class="btn btn-primary rounded-3 flex-fill"><i class="bi bi-search me-1"></i>Lọc</button>
+                <a asp-action="Index" class="btn btn-outline-secondary rounded-3"><i class="bi bi-arrow-clockwise"></i></a>
+            </div>
+        </form>
+    </div>
+
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-custom align-middle mb-0">
+                <thead>
+                    <tr><th class="ps-4">ID</th><th>Mã số thẻ</th><th>Sinh viên sở hữu</th><th>Ngày cấp</th><th>Ngày hết hạn</th><th>Trạng thái</th><th class="text-center pe-4">Thao tác</th></tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr><td colspan="7" class="text-center text-muted py-4"><i class="bi bi-inbox me-1"></i>Không có thẻ phù hợp.</td></tr>
+                    }
+                    else
+                    {
+                        foreach (var item in Model)
+                        {
+                            var badge = item.Status == "Active" ? "bg-success-subtle text-success" : item.Status == "Locked" || item.Status == "Expired" ? "bg-danger-subtle text-danger" : "bg-secondary-subtle text-secondary";
+                            <tr>
+                                <td class="ps-4 text-muted fw-bold">#@item.Id</td>
+                                <td><span class="card-code"><i class="bi bi-upc me-1"></i>@item.CardCode</span></td>
+                                <td><div class="fw-bold text-dark">@(item.ResidentProfile?.FullName ?? "N/A")</div><small class="text-muted">MSSV: @(item.ResidentProfile?.StudentCode ?? "-")</small></td>
+                                <td><div class="small fw-medium">@item.IssueDate.ToString("dd/MM/yyyy")</div></td>
+                                <td><div class="small text-muted">@(item.ExpiryDate?.ToString("dd/MM/yyyy") ?? "Vô thời hạn")</div></td>
+                                <td><span class="badge @badge badge-card">@(item.Status == "Active" ? "Đang hoạt động" : item.Status)</span></td>
+                                <td class="text-center pe-4">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-action btn-outline-info" title="Chi tiết"><i class="bi bi-eye"></i></a>
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-action btn-outline-warning" title="Sửa"><i class="bi bi-pencil"></i></a>
+                                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-action btn-outline-danger" title="Xóa"><i class="bi bi-trash"></i></a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card-footer bg-white border-0 py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <small class="text-muted">Hiển thị @Model.Count / @totalCount thẻ KTX</small>
+        <div class="btn-group btn-group-sm">
+            <a class="btn btn-outline-secondary @(currentPage <= 1 ? "disabled" : "")" asp-action="Index" asp-route-keyword="@keyword" asp-route-status="@status" asp-route-expiredState="@expiredState" asp-route-page="@(currentPage - 1)" asp-route-pageSize="@pageSize">Trước</a>
+            <span class="btn btn-light disabled">Trang @currentPage / @totalPages</span>
+            <a class="btn btn-outline-secondary @(currentPage >= totalPages ? "disabled" : "")" asp-action="Index" asp-route-keyword="@keyword" asp-route-status="@status" asp-route-expiredState="@expiredState" asp-route-page="@(currentPage + 1)" asp-route-pageSize="@pageSize">Sau</a>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,179 @@
+﻿@model QuanLyKTX.Models.Apartment
+
+@{
+    ViewData["Title"] = "Cập nhật phòng KTX";
+}
+
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12 mb-4">
+            <h3 class="fw-bold text-dark">
+                <i class="bi bi-pencil-square text-warning me-2"></i>Cập nhật phòng KTX
+            </h3>
+            <p class="text-muted">Chỉnh sửa thông tin phòng ở trong hệ thống KTX HUTECH.</p>
+        </div>
+    </div>
+
+    <form method="post" asp-area="Admin" asp-controller="Room" asp-action="Edit">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
+
+        <div class="row">
+            <div class="col-lg-8 mb-4">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-header bg-white border-0 pt-4 ps-4">
+                        <h5 class="fw-bold mb-0">Thông tin phòng</h5>
+                    </div>
+
+                    <div class="card-body p-4">
+                        <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="BuildingId" class="form-label fw-bold">
+                                    <i class="bi bi-building me-1"></i> Tòa nhà
+                                </label>
+                                <select asp-for="BuildingId" class="form-select form-select-lg shadow-none border-2"
+                                        asp-items="ViewBag.BuildingId">
+                                    <option value="">-- Chọn tòa nhà --</option>
+                                </select>
+                                <span asp-validation-for="BuildingId" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6 mt-3 mt-md-0">
+                                <label asp-for="ApartmentCode" class="form-label fw-bold">
+                                    <i class="bi bi-hash me-1"></i> Mã phòng
+                                </label>
+                                <input asp-for="ApartmentCode" class="form-control form-control-lg shadow-none border-2 bg-light"
+                                       placeholder="VD: A101, B203" />
+                                <span asp-validation-for="ApartmentCode" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="ApartmentType" class="form-label fw-bold">
+                                    <i class="bi bi-house-door me-1"></i> Loại phòng
+                                </label>
+                                <select asp-for="ApartmentType" class="form-select form-select-lg shadow-none border-2">
+                                    <option value="">-- Chọn loại phòng --</option>
+                                    <option value="Phòng 2 người">Phòng 2 người</option>
+                                    <option value="Phòng 4 người">Phòng 4 người</option>
+                                    <option value="Phòng 6 người">Phòng 6 người</option>
+                                    <option value="Phòng 8 người">Phòng 8 người</option>
+                                </select>
+                                <span asp-validation-for="ApartmentType" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6 mt-3 mt-md-0">
+                                <label asp-for="Floor" class="form-label fw-bold">
+                                    <i class="bi bi-layers me-1"></i> Tầng
+                                </label>
+                                <input asp-for="Floor" type="number" min="1"
+                                       class="form-control form-control-lg shadow-none border-2"
+                                       placeholder="VD: 1" />
+                                <span asp-validation-for="Floor" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <label asp-for="CurrentOccupancy" class="form-label fw-bold">
+                                    <i class="bi bi-person-check me-1"></i> Số hiện tại
+                                </label>
+                                <input asp-for="CurrentOccupancy" type="number" min="0"
+                                       class="form-control form-control-lg shadow-none border-2"
+                                       placeholder="0" />
+                                <span asp-validation-for="CurrentOccupancy" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-4 mt-3 mt-md-0">
+                                <label asp-for="MaxOccupancy" class="form-label fw-bold">
+                                    <i class="bi bi-people me-1"></i> Số tối đa
+                                </label>
+                                <input asp-for="MaxOccupancy" type="number" min="1"
+                                       class="form-control form-control-lg shadow-none border-2"
+                                       placeholder="4" />
+                                <span asp-validation-for="MaxOccupancy" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-4 mt-3 mt-md-0">
+                                <label asp-for="RoomPrice" class="form-label fw-bold">
+                                    <i class="bi bi-cash-coin me-1"></i> Giá phòng
+                                </label>
+                                <input asp-for="RoomPrice" type="number" min="0" step="1000"
+                                       class="form-control form-control-lg shadow-none border-2"
+                                       placeholder="VD: 800000" />
+                                <span asp-validation-for="RoomPrice" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-0">
+                            <label asp-for="Note" class="form-label fw-bold">
+                                <i class="bi bi-card-text me-1"></i> Ghi chú
+                            </label>
+                            <textarea asp-for="Note" rows="4"
+                                      class="form-control shadow-none border-2"
+                                      placeholder="Nhập ghi chú về phòng nếu có..."></textarea>
+                            <span asp-validation-for="Note" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold mb-3 text-muted small text-uppercase">Trạng thái phòng</h6>
+
+                        <div class="mb-4">
+                            <label asp-for="Status" class="form-label small text-muted fw-bold">TRẠNG THÁI</label>
+                            <select asp-for="Status" class="form-select shadow-none bg-light border-0 fw-bold text-primary py-2">
+                                <option value="Còn chỗ">🟢 Còn chỗ</option>
+                                <option value="Đã đầy">🔴 Đã đầy</option>
+                                <option value="Bảo trì">🟡 Bảo trì</option>
+                            </select>
+                            <span asp-validation-for="Status" class="text-danger small"></span>
+                        </div>
+
+                        <hr class="text-muted opacity-25" />
+
+                        <div class="alert alert-warning border-0 rounded-3 small mb-4">
+                            <i class="bi bi-exclamation-triangle me-1"></i>
+                            Nếu số hiện tại bằng hoặc lớn hơn số tối đa, hệ thống sẽ tự chuyển phòng sang trạng thái “Đã đầy” khi lưu.
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-warning btn-lg rounded-3 fw-bold py-3 shadow">
+                                <i class="bi bi-save me-1"></i> CẬP NHẬT
+                            </button>
+
+                            <a asp-area="Admin" asp-controller="Room" asp-action="Index"
+                                   class="btn btn-link text-secondary text-decoration-none small mt-2">
+                                <i class="bi bi-arrow-left me-1"></i> Hủy và quay lại
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-primary border-0 rounded-4 shadow-sm p-4">
+                    <h6 class="fw-bold">
+                        <i class="bi bi-lightbulb me-2"></i>Lưu ý quản lý
+                    </h6>
+                    <small class="d-block mb-2">Khi cập nhật phòng, nên kiểm tra:</small>
+                    <ul class="small ps-3 mb-0">
+                        <li>Mã phòng có đúng theo tòa và tầng không</li>
+                        <li>Số lượng hiện tại không vượt quá sức chứa</li>
+                        <li>Trạng thái phòng có phù hợp thực tế không</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

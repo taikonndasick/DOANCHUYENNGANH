@@ -1,0 +1,99 @@
+﻿@model IEnumerable<QuanLyKTX.Models.Notification>
+
+@{
+    ViewData["Title"] = "Thông báo từ Ban quản lý";
+}
+
+<style>
+    .notification-card {
+        border: none;
+        border-radius: 16px;
+        transition: all 0.3s ease;
+        background: #fff;
+        overflow: hidden;
+        border: 1px solid #f1f5f9;
+    }
+
+        .notification-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.08);
+        }
+
+    .notification-img {
+        height: 180px;
+        object-fit: cover;
+        width: 100%;
+    }
+
+    .text-truncate-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>
+
+<div class="container">
+    <div class="mb-4">
+        <h3 class="fw-bold text-dark">Bảng tin cư dân</h3>
+        <p class="text-muted">Cập nhật những tin tức và quy định mới nhất từ tòa nhà.</p>
+    </div>
+
+    <div class="row g-4">
+        @if (Model != null && Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card notification-card h-100">
+                        @if (!string.IsNullOrEmpty(item.ImagePath))
+                        {
+                            <img src="@item.ImagePath" class="notification-img" alt="@item.Title">
+                        }
+                        else
+                        {
+                            <div class="bg-light d-flex align-items-center justify-content-center" style="height: 180px;">
+                                <i class="bi bi-megaphone text-primary opacity-25" style="font-size: 3rem;"></i>
+                            </div>
+                        }
+
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-2">
+                                <span class="badge bg-primary-subtle text-primary rounded-pill small">Tin tức</span>
+                                <small class="text-muted ms-auto">
+                                    <i class="bi bi-calendar3 me-1"></i>@item.CreatedAt.ToString("dd/MM/yyyy")
+                                </small>
+                            </div>
+                            <h5 class="card-title fw-bold text-dark mb-2">@item.Title</h5>
+                            <p class="card-text text-muted small text-truncate-3">
+                                @item.Content
+                            </p>
+                        </div>
+
+                        <div class="card-footer bg-white border-0 pb-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <a asp-area="User" asp-controller="Notification" asp-action="Details" asp-route-id="@item.Id"
+                                   class="btn btn-primary btn-sm rounded-pill px-3">
+                                    Xem chi tiết
+                                </a>
+                                @if (!string.IsNullOrEmpty(item.PdfPath))
+                                {
+                                    <i class="bi bi-file-earmark-pdf text-danger fs-5" title="Có tệp đính kèm"></i>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12 text-center py-5">
+                <div class="opacity-25 mb-3">
+                    <i class="bi bi-chat-square-dots" style="font-size: 5rem;"></i>
+                </div>
+                <h5 class="text-muted">Hiện tại chưa có thông báo nào dành cho cư dân.</h5>
+            </div>
+        }
+    </div>
+</div>

@@ -1,0 +1,328 @@
+﻿@model QuanLyKTX.Models.Invoice
+@using QuanLyKTX.Models
+@using System.Text.Json
+
+@{
+    ViewData["Title"] = "Lập hóa đơn dịch vụ";
+    var services = (ViewBag.Services as List<Service>) ?? new List<Service>();
+    var selectedServiceId = ViewBag.SelectedServiceId as int?;
+    var quantityValue = ViewBag.Quantity ?? 1;
+    var unitPriceValue = ViewBag.UnitPrice ?? 0;
+    var serviceNoteValue = ViewBag.ServiceNote as string ?? "";
+
+    var serviceJson = JsonSerializer.Serialize(services.Select(s => new
+    {
+        id = s.Id,
+        name = s.Name,
+        price = s.Price,
+        type = s.Type,
+        description = s.Description ?? ""
+    }));
+}
+
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12 mb-4">
+            <h3 class="fw-bold text-dark">
+                <i class="bi bi-receipt-cutoff text-primary me-2"></i>Lập hóa đơn dịch vụ
+            </h3>
+            <p class="text-muted">Quản lý các khoản phí dịch vụ và thiết lập hạn thanh toán cho sinh viên KTX HUTECH.</p>
+        </div>
+    </div>
+
+    <form method="post" id="invoiceCreateForm">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="ResidentProfileId" id="ResidentProfileId" />
+
+        <div class="row">
+            <div class="col-lg-8 mb-4">
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-header bg-white border-0 pt-4 ps-4">
+                        <h5 class="fw-bold mb-0">
+                            <i class="bi bi-person-check text-primary me-2"></i>Thông tin sinh viên nhận hóa đơn
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Username</label>
+                                <input type="text" id="usernameSearch" class="form-control shadow-none border-2" placeholder="VD: user4" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Mã số sinh viên</label>
+                                <input type="text" id="studentCodeSearch" class="form-control shadow-none border-2" placeholder="VD: 2380601960" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Họ tên sinh viên</label>
+                                <input type="text" id="fullNameSearch" class="form-control shadow-none border-2" placeholder="VD: Nguyễn Văn A" />
+                            </div>
+                            <div class="col-12 d-flex gap-2 flex-wrap">
+                                <button type="button" class="btn btn-outline-primary rounded-3 fw-bold" onclick="searchStudent()">
+                                    <i class="bi bi-search me-1"></i> Tìm sinh viên
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary rounded-3" onclick="clearStudentSelection()">
+                                    <i class="bi bi-x-circle me-1"></i> Xóa chọn
+                                </button>
+                            </div>
+                        </div>
+
+                        <span asp-validation-for="ResidentProfileId" class="text-danger small d-block mt-2"></span>
+
+                        <div id="studentSelectedBox" class="alert alert-success rounded-4 mt-3 d-none mb-0"></div>
+                        <div id="studentResults" class="mt-3"></div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-header bg-white border-0 pt-4 ps-4">
+                        <h5 class="fw-bold mb-0">
+                            <i class="bi bi-receipt text-primary me-2"></i>Thông tin hóa đơn
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label asp-for="InvoiceCode" class="form-label fw-bold">
+                                    <i class="bi bi-hash me-1"></i> Mã hóa đơn
+                                </label>
+                                <input asp-for="InvoiceCode" class="form-control form-control-lg shadow-none border-2 bg-light"
+                                       placeholder="VD: INV-2026-001" />
+                                <span asp-validation-for="InvoiceCode" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="TotalAmount" class="form-label fw-bold">
+                                    <i class="bi bi-currency-dollar me-1"></i> Tổng tiền
+                                </label>
+                                <div class="input-group">
+                                    <input type="text" id="amountInput" class="form-control form-control-lg shadow-none border-2 fw-bold text-primary border-end-0"
+                                           placeholder="0" oninput="formatCurrency(this)" />
+                                    <span class="input-group-text bg-white border-2 border-start-0 fw-bold text-muted">VNĐ</span>
+                                </div>
+                                <input type="hidden" asp-for="TotalAmount" id="hiddenTotalAmount" />
+                                <span asp-validation-for="TotalAmount" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="bi bi-tools me-1"></i> Dịch vụ cần lập hóa đơn
+                                </label>
+                                <select name="serviceId" id="serviceSelect" class="form-select form-select-lg shadow-none border-2" onchange="onServiceChange()">
+                                    <option value="">-- Chọn dịch vụ --</option>
+                                    @foreach (var service in services)
+                                    {
+                                        var isSelected = selectedServiceId.HasValue && selectedServiceId.Value == service.Id;
+                                        <option value="@service.Id" data-price="@service.Price" data-name="@service.Name" selected="@(isSelected ? "selected" : null)">
+                                            @service.Name - @service.Price.ToString("N0") đ
+                                        </option>
+                                    }
+                                </select>
+                                <small class="text-muted">Tiền phòng không nằm trong danh mục dịch vụ. Tiền phòng được xử lý ở quy trình đăng ký cư trú.</small>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label fw-bold">Số lượng</label>
+                                <input type="number" name="quantity" id="quantityInput" min="1" value="@quantityValue" class="form-control form-control-lg shadow-none border-2" oninput="calculateTotal()" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Đơn giá</label>
+                                <div class="input-group">
+                                    <input type="text" id="unitPriceInput" value="@(unitPriceValue == 0 ? "" : string.Format("{0:N0}", unitPriceValue))" class="form-control form-control-lg shadow-none border-2" oninput="onUnitPriceInput(this)" />
+                                    <span class="input-group-text bg-white border-2">VNĐ</span>
+                                </div>
+                                <input type="hidden" name="unitPrice" id="unitPriceHidden" value="@unitPriceValue" />
+                            </div>
+                        </div>
+
+                        <div class="mb-0">
+                            <label asp-for="Description" class="form-label fw-bold">
+                                <i class="bi bi-card-text me-1"></i> Nội dung / ghi chú hóa đơn
+                            </label>
+                            <textarea asp-for="Description" id="invoiceDescription" class="form-control shadow-none border-2" rows="4"
+                                      placeholder="VD: Hóa đơn dịch vụ Internet/WiFi tháng 07/2026"></textarea>
+                            <textarea name="serviceNote" id="serviceNote" class="form-control shadow-none border-2 mt-2" rows="2"
+                                      placeholder="Ghi chú nội bộ nếu có...">@serviceNoteValue</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold mb-3">Thời hạn & trạng thái</h6>
+
+                        <div class="mb-3">
+                            <label asp-for="DueDate" class="form-label small text-muted fw-bold">HẠN THANH TOÁN</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-calendar-event"></i></span>
+                                <input asp-for="DueDate" type="date" class="form-control shadow-none border-start-0 bg-light" />
+                            </div>
+                            <span asp-validation-for="DueDate" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Status" class="form-label small text-muted fw-bold">TÌNH TRẠNG</label>
+                            <select asp-for="Status" class="form-select shadow-none bg-light border-0 fw-bold">
+                                <option value="Unpaid">🔴 Chưa thanh toán</option>
+                                <option value="Paid">🟢 Đã thanh toán</option>
+                                <option value="Cancelled">⚪ Đã hủy</option>
+                            </select>
+                        </div>
+
+                        <hr class="text-muted opacity-25">
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-3 fw-bold py-3 shadow">
+                                <i class="bi bi-check2-circle me-1"></i> PHÁT HÀNH HÓA ĐƠN
+                            </button>
+                            <a asp-area="Admin" asp-controller="Invoice" asp-action="Index" class="btn btn-link text-secondary text-decoration-none small mt-2">
+                                <i class="bi bi-x-circle me-1"></i> Hủy và quay lại
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-warning border-0 rounded-4 shadow-sm p-4">
+                    <h6 class="fw-bold"><i class="bi bi-exclamation-triangle me-2"></i>Lưu ý tài chính</h6>
+                    <small class="d-block">Sau khi hóa đơn được phát hành, sinh viên có thể xem và thanh toán tại mục <strong>Hóa đơn, biên lai</strong>.</small>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    const services = @Html.Raw(serviceJson);
+
+    function normalizeNumber(value) {
+        if (!value) return 0;
+        return Number(String(value).replace(/\D/g, '')) || 0;
+    }
+
+    function formatMoney(value) {
+        value = Number(value) || 0;
+        return new Intl.NumberFormat('vi-VN').format(value);
+    }
+
+    function formatCurrency(input) {
+        const value = normalizeNumber(input.value);
+        input.value = value ? formatMoney(value) : '';
+        document.getElementById('hiddenTotalAmount').value = value;
+    }
+
+    function onUnitPriceInput(input) {
+        const value = normalizeNumber(input.value);
+        input.value = value ? formatMoney(value) : '';
+        document.getElementById('unitPriceHidden').value = value;
+        calculateTotal();
+    }
+
+    function onServiceChange() {
+        const select = document.getElementById('serviceSelect');
+        const option = select.options[select.selectedIndex];
+        const price = option ? normalizeNumber(option.dataset.price) : 0;
+        const name = option ? option.dataset.name : '';
+
+        if (price > 0) {
+            document.getElementById('unitPriceInput').value = formatMoney(price);
+            document.getElementById('unitPriceHidden').value = price;
+        }
+
+        if (name) {
+            document.getElementById('invoiceDescription').value = `Hóa đơn dịch vụ: ${name}`;
+        }
+
+        calculateTotal();
+    }
+
+    function calculateTotal() {
+        const quantity = Number(document.getElementById('quantityInput').value) || 1;
+        const unitPrice = normalizeNumber(document.getElementById('unitPriceHidden').value || document.getElementById('unitPriceInput').value);
+        const total = quantity * unitPrice;
+        document.getElementById('amountInput').value = total ? formatMoney(total) : '';
+        document.getElementById('hiddenTotalAmount').value = total;
+    }
+
+    async function searchStudent() {
+        const username = document.getElementById('usernameSearch').value.trim();
+        const studentCode = document.getElementById('studentCodeSearch').value.trim();
+        const fullName = document.getElementById('fullNameSearch').value.trim();
+        const resultsBox = document.getElementById('studentResults');
+
+        resultsBox.innerHTML = '';
+
+        if (!username && !studentCode && !fullName) {
+            resultsBox.innerHTML = `<div class="alert alert-warning rounded-4 mb-0">Nhập ít nhất một thông tin: username, mã số sinh viên hoặc họ tên.</div>`;
+            return;
+        }
+
+        const url = '@Url.Action("SearchStudent", "Invoice", new { area = "Admin" })'
+            + `?username=${encodeURIComponent(username)}&studentCode=${encodeURIComponent(studentCode)}&fullName=${encodeURIComponent(fullName)}`;
+
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (!data || data.length === 0) {
+            resultsBox.innerHTML = `<div class="alert alert-danger rounded-4 mb-0">Không tìm thấy sinh viên phù hợp.</div>`;
+            clearStudentSelection(false);
+            return;
+        }
+
+        if (data.length === 1) {
+            selectStudent(data[0]);
+            return;
+        }
+
+        let html = `<div class="border rounded-4 overflow-hidden"><div class="p-3 fw-bold bg-light">Tìm thấy ${data.length} sinh viên, chọn đúng sinh viên cần lập hóa đơn:</div>`;
+        data.forEach(item => {
+            html += `<button type="button" class="list-group-item list-group-item-action p-3 border-0 border-top w-100 text-start" onclick='selectStudent(${JSON.stringify(item)})'>
+                        <div class="fw-bold">${item.fullName || ''} <span class="text-muted small">(${item.studentCode || 'Chưa có MSSV'})</span></div>
+                        <div class="small text-muted">Username: ${item.username || '-'} | Phòng: ${item.room || '-'} | Trạng thái: ${item.status || '-'}</div>
+                    </button>`;
+        });
+        html += `</div>`;
+        resultsBox.innerHTML = html;
+    }
+
+    function selectStudent(item) {
+        document.getElementById('ResidentProfileId').value = item.id;
+        document.getElementById('usernameSearch').value = item.username || '';
+        document.getElementById('studentCodeSearch').value = item.studentCode || '';
+        document.getElementById('fullNameSearch').value = item.fullName || '';
+
+        document.getElementById('studentResults').innerHTML = '';
+        const selectedBox = document.getElementById('studentSelectedBox');
+        selectedBox.classList.remove('d-none');
+        selectedBox.innerHTML = `<strong>Đã chọn sinh viên:</strong> ${item.fullName || ''} - MSSV: ${item.studentCode || '-'} - Username: ${item.username || '-'}<br>
+                                 <small>Email: ${item.email || '-'} | SĐT: ${item.phoneNumber || '-'} | Phòng: ${item.room || '-'}</small>`;
+    }
+
+    function clearStudentSelection(clearInputs = true) {
+        document.getElementById('ResidentProfileId').value = '';
+        document.getElementById('studentSelectedBox').classList.add('d-none');
+        document.getElementById('studentSelectedBox').innerHTML = '';
+        if (clearInputs) {
+            document.getElementById('usernameSearch').value = '';
+            document.getElementById('studentCodeSearch').value = '';
+            document.getElementById('fullNameSearch').value = '';
+            document.getElementById('studentResults').innerHTML = '';
+        }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        calculateTotal();
+        ['usernameSearch', 'studentCodeSearch', 'fullNameSearch'].forEach(id => {
+            document.getElementById(id).addEventListener('keydown', function (event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    searchStudent();
+                }
+            });
+        });
+    });
+</script>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

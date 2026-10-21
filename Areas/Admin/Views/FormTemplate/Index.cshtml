@@ -1,0 +1,108 @@
+@model IEnumerable<QuanLyKTX.Models.FormTemplate>
+@{
+    ViewData["Title"] = "Quản lý biểu mẫu";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var keyword = ViewBag.Keyword as string;
+    var status = ViewBag.Status as string ?? "Tất cả";
+}
+
+<div class="card border-0 shadow-sm rounded-4">
+    <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-3">
+            <div>
+                <h3 class="fw-bold mb-1"><i class="bi bi-journal-plus text-primary me-2"></i>Quản lý biểu mẫu</h3>
+                <p class="text-muted mb-0">Admin thêm, sửa, tạm ngưng hoặc xóa các mẫu biểu để sinh viên chọn và điền trực tuyến.</p>
+            </div>
+            <a asp-action="Create" class="btn btn-primary rounded-pill px-4">
+                <i class="bi bi-plus-circle me-1"></i> Thêm biểu mẫu
+            </a>
+        </div>
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success rounded-3">@TempData["Success"]</div>
+        }
+
+        <form method="get" class="row g-2 align-items-end mb-3">
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Tìm kiếm</label>
+                <input name="keyword" value="@keyword" class="form-control" placeholder="Tìm theo tên, loại biểu mẫu, mô tả..." />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-semibold">Trạng thái</label>
+                <select name="status" class="form-select">
+                    @foreach (var item in new[] { "Tất cả", "Đang sử dụng", "Tạm ngưng", "Tạm thời" })
+                    {
+                        <option value="@item" selected="@(status == item)">@item</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3 d-flex gap-2">
+                <button class="btn btn-primary flex-fill"><i class="bi bi-search"></i> Tìm</button>
+                <a asp-action="Index" class="btn btn-light border">Reset</a>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Tên biểu mẫu</th>
+                        <th>Loại</th>
+                        <th>File mẫu</th>
+                        <th>Trạng thái</th>
+                        <th>Ngày tạo</th>
+                        <th class="text-end">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            <div class="fw-bold"><i class="bi @item.Icon text-primary me-2"></i>@item.Name</div>
+                            <small class="text-muted">@item.Description</small>
+                        </td>
+                        <td><span class="badge text-bg-light border">@item.Type</span></td>
+                        <td>
+                            @if (!string.IsNullOrWhiteSpace(item.TemplateFilePath))
+                            {
+                                <a href="@item.TemplateFilePath" target="_blank" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-file-earmark-arrow-down"></i> @item.OriginalFileName
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Form trực tuyến</span>
+                            }
+                        </td>
+                        <td>
+                            @if (item.IsActive)
+                            {
+                                <span class="badge bg-success">Đang sử dụng</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Tạm ngưng</span>
+                            }
+                            @if (item.IsTemporary)
+                            {
+                                <span class="badge bg-warning text-dark ms-1">Tạm thời</span>
+                            }
+                        </td>
+                        <td>@item.CreatedAt.ToString("dd/MM/yyyy")</td>
+                        <td class="text-end">
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
+                            <form asp-action="ToggleStatus" asp-route-id="@item.Id" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button class="btn btn-sm btn-outline-secondary" title="Bật/tạm ngưng"><i class="bi bi-power"></i></button>
+                            </form>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
